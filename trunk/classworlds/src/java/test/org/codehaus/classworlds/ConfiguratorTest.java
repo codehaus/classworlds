@@ -59,7 +59,7 @@ public class ConfiguratorTest extends TestCase
     private Launcher launcher;
     private Configurator configurator;
 
-    public ConfiguratorTest( String name )
+    public ConfiguratorTest(String name)
     {
         super( name );
     }
@@ -74,16 +74,21 @@ public class ConfiguratorTest extends TestCase
     {
         this.launcher = null;
         this.configurator = null;
+        System.getProperties().remove( "set.using.existent" );
+        System.getProperties().remove( "set.using.default" );
+        System.getProperties().remove( "set.using.nonexistent" );
+        System.getProperties().remove( "set.using.nonexistent.default" );
+	System.getProperties().remove( "set.using.missing" );
     }
 
-    public void testConfigure_Nonexistant() throws Exception
+    public void testConfigure_Nonexistent() throws Exception
     {
         try
         {
             this.configurator.configure( getConfigPath( "notfound.conf" ) );
             fail( "throw FileNotFoundException" );
         }
-        catch ( FileNotFoundException e )
+        catch (FileNotFoundException e)
         {
             // expected and correct
         }
@@ -96,7 +101,7 @@ public class ConfiguratorTest extends TestCase
             this.configurator.configure( getConfigPath( "dupe-main.conf" ) );
             fail( "throw ConfigurationException" );
         }
-        catch ( ConfigurationException e )
+        catch (ConfigurationException e)
         {
             // expected and correct
             assertTrue( e.getMessage().startsWith( "Duplicate main" ) );
@@ -110,7 +115,7 @@ public class ConfiguratorTest extends TestCase
             this.configurator.configure( getConfigPath( "dupe-realm.conf" ) );
             fail( "throw DuplicateRealmException" );
         }
-        catch ( DuplicateRealmException e )
+        catch (DuplicateRealmException e)
         {
             // expected and correct
             assertEquals( "dupe.realm",
@@ -125,7 +130,7 @@ public class ConfiguratorTest extends TestCase
             this.configurator.configure( getConfigPath( "early-import.conf" ) );
             fail( "throw ConfigurationException" );
         }
-        catch ( ConfigurationException e )
+        catch (ConfigurationException e)
         {
             // expected and correct
             assertTrue( e.getMessage().startsWith( "Unhandled import" ) );
@@ -139,7 +144,7 @@ public class ConfiguratorTest extends TestCase
             this.configurator.configure( getConfigPath( "realm-syntax.conf" ) );
             fail( "throw ConfigurationException" );
         }
-        catch ( ConfigurationException e )
+        catch (ConfigurationException e)
         {
             // expected and correct
             assertTrue( e.getMessage().startsWith( "Invalid realm" ) );
@@ -152,7 +157,7 @@ public class ConfiguratorTest extends TestCase
 
         assertEquals( "org.apache.maven.app.App",
                       this.launcher.getMainClassName() );
-
+        
         assertEquals( "maven",
                       this.launcher.getMainRealmName() );
 
@@ -172,22 +177,89 @@ public class ConfiguratorTest extends TestCase
         ClassRealm xmlRealm = world.getRealm( "xml" );
         ClassRealm globRealm = world.getRealm( "glob" );
 
-        assertSame( antRealm, antRealm.locateSourceRealm( "org.apache.tools.Ant" ) );
+        assertSame( antRealm,
+                    antRealm.locateSourceRealm( "org.apache.tools.Ant" ) );
 
-        assertSame( xmlRealm, antRealm.locateSourceRealm( "org.xml.sax.SAXException" ) );
+        assertSame( xmlRealm,
+                    antRealm.locateSourceRealm( "org.xml.sax.SAXException" ) );
 
-        assertSame( mavenRealm, mavenRealm.locateSourceRealm( "org.apache.maven.app.App" ) );
+        assertSame( mavenRealm,
+                    mavenRealm.locateSourceRealm( "org.apache.maven.app.App" ) );
 
-        assertSame( xmlRealm, mavenRealm.locateSourceRealm( "org.xml.sax.SAXException" ) );
+        assertSame( xmlRealm,
+                    mavenRealm.locateSourceRealm( "org.xml.sax.SAXException" ) );
                     
         // Test the glob support
         RealmClassLoader cl = (RealmClassLoader) globRealm.getClassLoader();
         URL[] urls = cl.getURLs();
+        
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/nested.jar").toURL());
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/a.jar").toURL());
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/b.jar").toURL());
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/c.jar").toURL());
+    }
 
-        assertArrayContains( urls, new File( System.getProperty( "basedir" ) + "/target/test-data/nested.jar" ).toURL() );
-        assertArrayContains( urls, new File( System.getProperty( "basedir" ) + "/target/test-data/a.jar" ).toURL() );
-        assertArrayContains( urls, new File( System.getProperty( "basedir" ) + "/target/test-data/b.jar" ).toURL() );
-        assertArrayContains( urls, new File( System.getProperty( "basedir" ) + "/target/test-data/c.jar" ).toURL() );
+    public void testConfigure_Optionally_NonExistent() throws Exception
+    {
+        this.configurator.configure( getConfigPath( "optionally-nonexistent.conf" ) );
+
+        assertEquals( "org.apache.maven.app.App",
+                      this.launcher.getMainClassName() );
+        
+        assertEquals( "opt",
+                      this.launcher.getMainRealmName() );
+
+        ClassWorld world = this.launcher.getWorld();
+
+        Collection realms = world.getRealms();
+
+        assertEquals( 1,
+                      realms.size() );
+
+        assertNotNull( world.getRealm( "opt" ) );
+
+        ClassRealm optRealm = world.getRealm( "opt" );
+
+        RealmClassLoader cl = (RealmClassLoader) optRealm.getClassLoader();
+
+        URL[] urls = cl.getURLs();
+
+        assertEquals( "no urls",
+                      0,
+                      urls.length );
+    }
+
+    public void testConfigure_Optionally_Existent() throws Exception
+    {
+        this.configurator.configure( getConfigPath( "optionally-existent.conf" ) );
+
+        assertEquals( "org.apache.maven.app.App",
+                      this.launcher.getMainClassName() );
+        
+        assertEquals( "opt",
+                      this.launcher.getMainRealmName() );
+
+        ClassWorld world = this.launcher.getWorld();
+
+        Collection realms = world.getRealms();
+
+        assertEquals( 1,
+                      realms.size() );
+
+        assertNotNull( world.getRealm( "opt" ) );
+
+        ClassRealm optRealm = world.getRealm( "opt" );
+
+        RealmClassLoader cl = (RealmClassLoader) optRealm.getClassLoader();
+
+        URL[] urls = cl.getURLs();
+
+        assertEquals( "one url",
+                      1,
+                      urls.length );
+
+        assertSame( optRealm,
+                    optRealm.locateSourceRealm( "org.xml.sax.SAXException" ) );
     }
 
     public void testConfigure_Unhandled() throws Exception
@@ -197,7 +269,7 @@ public class ConfiguratorTest extends TestCase
             this.configurator.configure( getConfigPath( "unhandled.conf" ) );
             fail( "throw ConfigurationException" );
         }
-        catch ( ConfigurationException e )
+        catch (ConfigurationException e)
         {
             // expected and correct
             assertTrue( e.getMessage().startsWith( "Unhandled configuration" ) );
@@ -211,7 +283,7 @@ public class ConfiguratorTest extends TestCase
             this.configurator.filter( "${cheese" );
             fail( "throw ConfigurationException" );
         }
-        catch ( ConfigurationException e )
+        catch (ConfigurationException e)
         {
             // expected and correct
             assertTrue( e.getMessage().startsWith( "Unterminated" ) );
@@ -272,7 +344,7 @@ public class ConfiguratorTest extends TestCase
             this.configurator.filter( "${gollygeewillikers}" );
             fail( "throw ConfigurationException" );
         }
-        catch ( ConfigurationException e )
+        catch (ConfigurationException e)
         {
             // expected and correct
             assertTrue( e.getMessage().startsWith( "No such property" ) );
@@ -290,17 +362,91 @@ public class ConfiguratorTest extends TestCase
                       result );
     }
 
-    private FileInputStream getConfigPath( String name )
-        throws Exception
+    public void testSet_Using_Existent() throws Exception
     {
-        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "target/test-data" ), name ) );
+        assertNull( System.getProperty( "set.using.existent" ) );
+        
+        this.configurator.configure( getConfigPath( "set-using-existent.conf" ) );
+
+        assertEquals( "testSet_Using_Existent", System.getProperty( "set.using.existent" ) );
     }
 
-    private void assertArrayContains( URL[] array, URL url ) throws Exception
+    public void testSet_Using_NonExistent() throws Exception
     {
-        for ( int i = 0; i < array.length; ++i )
-            if ( url.equals( array[i] ) )
+        assertNull( System.getProperty( "set.using.nonexistent" ) );
+        
+        this.configurator.configure( getConfigPath( "set-using-nonexistent.conf" ) );
+
+        assertNull( System.getProperty( "set.using.nonexistent" ) );
+    }
+
+    public void testSet_Using_NonExistent_Default() throws Exception
+    {
+        assertNull( System.getProperty( "set.using.nonexistent.default" ) );
+        
+        this.configurator.configure( getConfigPath( "set-using-nonexistent.conf" ) );
+
+        assertEquals( "testSet_Using_NonExistent_Default", System.getProperty( "set.using.nonexistent.default" ) );
+    }
+
+    public void testSet_Using_NonExistent_Override() throws Exception
+    {
+        assertNull( System.getProperty( "set.using.default" ) );
+        System.setProperty( "set.using.default", "testSet_Using_NonExistent_Override" );
+        
+        this.configurator.configure( getConfigPath( "set-using-nonexistent.conf" ) );
+
+        assertEquals( "testSet_Using_NonExistent_Override", System.getProperty( "set.using.default" ) );
+    }
+
+    public void testSet_Using_Existent_Override() throws Exception
+    {
+        assertNull( System.getProperty( "set.using.existent" ) );
+        System.setProperty( "set.using.existent", "testSet_Using_Existent_Override" );
+        
+        this.configurator.configure( getConfigPath( "set-using-existent.conf" ) );
+
+        assertEquals( "testSet_Using_Existent_Override", System.getProperty( "set.using.existent" ) );
+    }
+
+    public void testSet_Using_Existent_Default() throws Exception
+    {
+        assertNull( System.getProperty( "set.using.default" ) );
+        
+        this.configurator.configure( getConfigPath( "set-using-existent.conf" ) );
+
+        assertEquals( "testSet_Using_Existent_Default", System.getProperty( "set.using.default" ) );
+    }
+
+    public void testSet_Using_Missing_Default() throws Exception
+    {
+        assertNull( System.getProperty( "set.using.missing" ) );
+        
+        this.configurator.configure( getConfigPath( "set-using-missing.conf" ) );
+
+        assertEquals( "testSet_Using_Missing_Default", System.getProperty( "set.using.missing" ) );
+    }
+
+    public void testSet_Using_Missing_Override() throws Exception
+    {
+        assertNull( System.getProperty( "set.using.missing" ) );
+        System.setProperty( "set.using.missing", "testSet_Using_Missing_Override" );
+        
+        this.configurator.configure( getConfigPath( "set-using-missing.conf" ) );
+
+        assertEquals( "testSet_Using_Missing_Override", System.getProperty( "set.using.missing" ) );
+    }
+
+    private FileInputStream getConfigPath(String name)
+        throws Exception
+    {
+        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "target/test-data" ), name ) ) ;
+    }
+
+    private void assertArrayContains(URL[] array, URL url) throws Exception {
+        for (int i = 0; i < array.length; ++i)
+            if (url.equals(array[i]))
                 return;
-        fail( "URL (" + url + ") not found in array of URLs" );
+        fail("URL (" + url + ") not found in array of URLs");
     }
 }

@@ -82,12 +82,21 @@ public class Configurator
 
     public static final String LOAD_PREFIX = "load";
 
+    /** Optionally spec prefix. */
+    public static final String OPTIONALLY_PREFIX = "optionally";
+
+    /** The launcher to configure. */
     private Launcher launcher;
 
     private ClassWorld world;
 
+    /** Processed Realms. */
     private Map configuredRealms;
 
+    /** Construct.
+     *
+     *  @param launcher The launcher to configure.
+     */
     public Configurator( Launcher launcher )
     {
         this.launcher = launcher;
@@ -95,11 +104,20 @@ public class Configurator
         configuredRealms = new HashMap();
     }
 
+    /** Construct.
+     *
+     *  @param classWorld The classWorld to configure.
+     */
     public Configurator( ClassWorld world )
     {
         setClassWorld( world );
     }
 
+    /** set world.
+     *  this setter is provided so you can use the same configurator to configure several "worlds"
+     *
+     *  @param classWorld The classWorld to configure.
+     */
     public void setClassWorld( ClassWorld world )
     {
         this.world = world;
@@ -184,50 +202,67 @@ public class Configurator
             {
                 String conf = line.substring( SET_PREFIX.length() ).trim();
 
-                int usingLoc = conf.indexOf( "using" );
+                int usingLoc = conf.indexOf( " using" ) + 1;
 
-                if ( usingLoc < 0 )
+                String property = null;
+                String propertiesFileName = null;
+                if ( usingLoc > 0 )
                 {
-                    throw new ConfigurationException( "Missing using clause", lineNo, line );
+                    property = conf.substring( 0, usingLoc ).trim();
+
+                    propertiesFileName = filter( conf.substring( usingLoc + 5 ).trim() );
+
+                    conf = propertiesFileName;
                 }
-
-                String property = conf.substring( 0, usingLoc ).trim();
-
-                String propertiesFileName = filter( conf.substring( usingLoc + 5 ).trim() );
 
                 String defaultValue = null;
 
-                int defaultLoc = propertiesFileName.indexOf( "default" );
+                int defaultLoc = conf.indexOf( " default" ) + 1;
 
                 if ( defaultLoc > 0 )
                 {
-                    defaultValue = propertiesFileName.substring( defaultLoc + 7 ).trim();
+                    defaultValue = conf.substring( defaultLoc + 7 ).trim();
 
-                    propertiesFileName = propertiesFileName.substring( 0, defaultLoc ).trim();
+                    if ( property == null )
+                    {
+                        property = conf.substring( 0, defaultLoc ).trim();
+                    }
+                    else
+                    {
+                        propertiesFileName = conf.substring( 0, defaultLoc ).trim();
+                    }
                 }
 
-                File propertiesFile = new File( propertiesFileName );
+                if ( System.getProperty( property ) != null )
+                {
+                    return;
+                }
 
                 String value = null;
                 
-                if ( propertiesFile.exists() )
+                if ( propertiesFileName != null )
                 {
-                    Properties properties = new Properties();
+                    File propertiesFile = new File( propertiesFileName );
 
-                    try
+                    if ( propertiesFile.exists() )
                     {
-                        properties.load( new FileInputStream( propertiesFileName ) );
+                        Properties properties = new Properties();
 
-                        value = properties.getProperty( property );
-
-                        if ( value != null && value.trim().length() > 0 )
+                        try
                         {
-                            value = filter( properties.getProperty( property ) );
+                            properties.load( new FileInputStream( propertiesFileName ) );
+    
+                            value = properties.getProperty( property );
+
+                            if ( value != null && value.trim().length() > 0 )
+                            {
+                                value = filter( properties.getProperty( property ) );
+                            }
                         }
-                    }
-                    catch ( Exception e )
-                    {
-                        // do nothing
+                        catch ( Exception e )
+                        {
+                            // do nothing
+                        }
                     }
                 }
 
@@ -311,6 +346,37 @@ public class Configurator
                     }
                 }
             }
+            else if ( line.startsWith( OPTIONALLY_PREFIX ) )
+            {
+                String constituent = line.substring( OPTIONALLY_PREFIX.length() ).trim();
+
+                constituent = filter( constituent );
+
+                if ( constituent.indexOf( "*" ) >= 0 )
+                {
+                    loadGlob( constituent, curRealm, true );
+                }
+                else
+                {
+                    File file = new File( constituent );
+
+                    if ( file.exists() )
+                    {
+                        curRealm.addConstituent( file.toURL() );
+                    }
+                    else
+                    {
+                        try
+                        {
+                            curRealm.addConstituent( new URL( constituent ) );
+                        }
+                        catch (MalformedURLException e)
+                        {
+                            // swallow
+                        }
+                    }
+                }
+            }
             else
             {
                 throw new ConfigurationException( "Unhandled configuration", lineNo, line );
@@ -384,13 +450,43 @@ public class Configurator
      * @param realm The realm to populate
      * @throws MalformedURLException If the line does not represent
      *                               a valid path element.
+     * @throws FileNotFoundException If the line does not represent
+     *                               a valid path element in the filesystem.
      */
     protected void loadGlob( String line, ClassRealm realm )
-        throws MalformedURLException
+        throws MalformedURLException, FileNotFoundException
+    {
+        loadGlob( line, realm, false );
+    }
+
+    /**
+     * Load a glob into the specified classloader.
+     *
+     * @param line  The path configuration line.
+     * @param realm The realm to populate
+     * @param optionally Whether the path is optional or required
+     * @throws MalformedURLException If the line does not represent
+     *                               a valid path element.
+     * @throws FileNotFoundException If the line does not represent
+     *                               a valid path element in the filesystem.
+     */
+    protected void loadGlob( String line, ClassRealm realm, boolean optionally )
+        throws MalformedURLException, FileNotFoundException
     {
         File globFile = new File( line );
 
         File dir = globFile.getParentFile();
+        if ( ! dir.exists() )
+        {
+            if ( optionally )
+            {
+                return;
+            }
+            else
+            {
+                throw new FileNotFoundException( dir.toString() );
+            }
+        }
 
         String localName = globFile.getName();
 
@@ -400,30 +496,27 @@ public class Configurator
 
         final String suffix = localName.substring( starLoc + 1 );
 
-        if ( dir.exists() )
+        File[] matches = dir.listFiles( new FilenameFilter()
         {
-            File[] matches = dir.listFiles( new FilenameFilter()
+            public boolean accept( File dir, String name )
             {
-                public boolean accept( File dir, String name )
+                if ( !name.startsWith( prefix ) )
                 {
-                    if ( !name.startsWith( prefix ) )
-                    {
-                        return false;
-                    }
-
-                    if ( !name.endsWith( suffix ) )
-                    {
-                        return false;
-                    }
-
-                    return true;
+                    return false;
                 }
-            } );
 
-            for ( int i = 0; i < matches.length; ++i )
-            {
-                realm.addConstituent( matches[i].toURL() );
+                if ( !name.endsWith( suffix ) )
+                {
+                    return false;
+                }
+
+                return true;
             }
+        } );
+
+        for ( int i = 0; i < matches.length; ++i )
+        {
+            realm.addConstituent( matches[i].toURL() );
         }
     }
 
