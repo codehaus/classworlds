@@ -139,7 +139,7 @@ class DefaultClassRealm implements ClassRealm
         {
             this.classLoader = new RealmClassLoader( this, parentClassLoader );
         }
-        
+
         this.totalUniqueURLs = 0;
         this.totalURLs = 0;
         this.totalClassLoaders = 1;
@@ -245,10 +245,10 @@ class DefaultClassRealm implements ClassRealm
             }
             else
             {
-                //add latest version of class and then reload(); - do garbage
+                // add latest version of class and then reload(); - do garbage
                 // collection
                 this.urlCache.put(constituent.toExternalForm(), constituent);
-                reload();
+                reload( false );
             }
         }
         else
@@ -258,7 +258,7 @@ class DefaultClassRealm implements ClassRealm
             this.urlCache.put(constituent.toExternalForm(), constituent);
             this.totalURLs++;
         }
-        
+
         this.totalUniqueURLs = urlCache.size();
     }
 
@@ -305,8 +305,8 @@ class DefaultClassRealm implements ClassRealm
             os.close();
             url = path.toURL();
             */
-            addConstituent( new URL( null, 
-                                     file.toURL().toExternalForm(), 
+            addConstituent( new URL( null,
+                                     file.toURL().toExternalForm(),
                                      new BytesURLStreamHandler(b) ) );
         }
         catch (java.io.IOException e)
@@ -346,6 +346,11 @@ class DefaultClassRealm implements ClassRealm
      */
     public ClassLoader getClassLoader()
     {
+        //must return a single unified classLoader, perform GC if necessary.
+        if (this.classLoaders.size() > 0)
+        {
+          reload( false );
+        }
         return this.classLoader;
     }
 
@@ -467,6 +472,11 @@ class DefaultClassRealm implements ClassRealm
         // 1. Try this realm's ClassLoader.
         // 2. If the realm has a parent try the parent's ClassLoader.
 
+        //must use a single unified classLoader, perform GC if necessary.
+        if (this.classLoaders.size() > 0)
+        {
+          reload( false );
+        }
         URL resource = this.classLoader.getResourceFromClassLoader( name );
 
         if ( resource == null
@@ -505,6 +515,12 @@ class DefaultClassRealm implements ClassRealm
 
         Vector resources = new Vector();
 
+        //must use a single unified classLoader, perform GC if necessary.
+        if (this.classLoaders.size() > 0)
+        {
+          reload( false );
+        }
+
         // Attempt to load directly first, then go to the imported packages.
         Enumeration direct = classLoader.findResourcesFromClassLoader( name );
 
@@ -530,16 +546,25 @@ class DefaultClassRealm implements ClassRealm
     public Enumeration getResources(String name)
         throws IOException
     {
-        return classLoader.getResources( name );
+        //must use a single unified classLoader, perform GC if necessary.
+        if (this.classLoaders.size() > 0)
+        {
+          reload( false );
+        }
+        return this.classLoader.getResources( name );
     }
 
+    /**
+     * Checks to see if a given classLoader contains the given URL
+     *
+     */
     private static boolean containsURL(RealmClassLoader classLoader, URL url)
     {
         boolean contains = false;
         String urlStr;
         String srcUrlStr = url.toExternalForm();
         URL[] urls = classLoader.getURLs();
-        
+
         for (int i=0; i < urls.length; i++)
         {
             urlStr = urls[i].toExternalForm();
@@ -575,13 +600,13 @@ class DefaultClassRealm implements ClassRealm
         String urlStr;
         Set keys = this.urlCache.keySet();
         Iterator it = keys.iterator();
-        
+
         while (it.hasNext())
         {
             urlStr = (String) it.next();
             this.classLoader.addConstituent((URL) this.urlCache.get(urlStr));
         }
-        
+
         this.classLoaders.clear();
         this.totalUniqueURLs = this.urlCache.size();
         this.totalURLs = this.totalUniqueURLs;
