@@ -79,6 +79,8 @@ public class Launcher
 
     protected static final String UBERJAR_CONF_DIR = "WORLDS-INF/conf/";
 
+    protected ClassLoader systemClassLoader;
+
     protected String mainClassName;
 
     protected String mainRealmName;
@@ -89,6 +91,16 @@ public class Launcher
 
     public Launcher()
     {
+    }
+
+    public void setSystemClassLoader( ClassLoader loader )
+    {
+        this.systemClassLoader = loader;
+    }
+
+    public ClassLoader getSystemClassLoader()
+    {
+        return this.systemClassLoader;
     }
 
     public int getExitCode()
@@ -386,14 +398,16 @@ public class Launcher
 
         Launcher launcher = new Launcher();
 
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        launcher.setSystemClassLoader( cl );
+
         if ( classworldsConf != null )
         {
             is = new FileInputStream( classworldsConf );
         }
         else
         {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
             if ( "true".equals( System.getProperty( "classworlds.bootstrapped" ) ) )
             {
                 is = cl.getResourceAsStream( UBERJAR_CONF_DIR + CLASSWORLDS_CONF );
