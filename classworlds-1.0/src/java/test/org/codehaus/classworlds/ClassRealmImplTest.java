@@ -308,11 +308,22 @@ public class ClassRealmImplTest extends TestCase
         ClassRealm mainRealm = this.world.newRealm( "main" );
         ClassRealm realmA = this.world.newRealm( "realmA" );
 
+        try
+        {
+            realmA.loadClass( "a.A" );
+            fail("realmA.loadClass(a.A) should have thrown a ClassNotFoundException");
+        }
+        catch (ClassNotFoundException e)
+        {
+            // expected and correct
+        }
+                
         realmA.addConstituent( getJarUrl( "a.jar" ) );
 
         try
         {
             mainRealm.loadClass( "a.A" );
+            fail("mainRealm.loadClass(a.A) should have thrown a ClassNotFoundException");
         }
         catch (ClassNotFoundException e)
         {
@@ -446,7 +457,7 @@ public class ClassRealmImplTest extends TestCase
     protected URL getJarUrl(String jarName) throws MalformedURLException
     {
         return new File( new File( System.getProperty( "basedir" ),
-                                   "test-data" ),
+                                   "target/test-data" ),
                          jarName ).toURL();
     }
     

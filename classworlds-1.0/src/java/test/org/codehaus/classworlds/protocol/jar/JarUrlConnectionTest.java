@@ -56,7 +56,7 @@ public class JarUrlConnectionTest
         throws Exception
     {
         File testDir = new File ( System.getProperty( "basedir" ),
-                                  "test-data" );
+                                  "target/test-data" );
 
         File jarFile = new File( testDir,
                                  jarName );

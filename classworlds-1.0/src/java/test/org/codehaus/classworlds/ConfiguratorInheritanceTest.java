@@ -124,13 +124,13 @@ public class ConfiguratorInheritanceTest extends TestCase
     private FileInputStream getConfigPath(String name)
         throws Exception
     {
-        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "test-data" ), name ) ) ;
+        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "target/test-data" ), name ) ) ;
     }
 
     protected URL getJarUrl(String jarName) throws MalformedURLException
     {
         return new File( new File( System.getProperty( "basedir" ),
-                                   "test-data" ),
+                                   "target/test-data" ),
                          jarName ).toURL();
     }
 }
