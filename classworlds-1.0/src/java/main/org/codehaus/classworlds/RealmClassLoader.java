@@ -76,10 +76,21 @@ class RealmClassLoader
      */
     RealmClassLoader(DefaultClassRealm realm)
     {
-        super( new URL[0] );
-        this.realm = realm;
+        this( realm, null );
     }
 
+    /** Construct.
+     *
+     *  @param realm The realm for which this loads.
+     * 
+     *  @param classLoader The parent ClassLoader.
+     */
+    RealmClassLoader(DefaultClassRealm realm, ClassLoader classLoader)
+    {
+        super( new URL[0], classLoader );
+        this.realm = realm;
+    }
+    
     // ------------------------------------------------------------
     //     Instance methods
     // ------------------------------------------------------------
