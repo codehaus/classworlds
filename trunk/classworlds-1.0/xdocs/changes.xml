@@ -11,6 +11,12 @@
         Fixed the handling of URLs that contain ".." and URLs that
         start with a leading slash.
       </action>
+      <action dev="jvanzyl" type="fix">
+        Apply Stephen Haberman's patch so that getJarFile decodes the getFile()
+        contents correctly. Refer to 
+        <a href="http://jira.codehaus.org/secure/ViewIssue.jspa?key=CLASSWORLDS-7">CLASSWORDS-7</a> 
+        in JIRA.
+      </action>
     </release>
   </body>
 </document>
