@@ -97,7 +97,7 @@ public class ClassWorld
                                                id );
         }
 
-        ClassRealmImpl realm = new ClassRealmImpl( this,
+        DefaultClassRealm realm = new DefaultClassRealm( this,
                                                    id );
 
         this.realms.put( id,
@@ -135,9 +135,9 @@ public class ClassWorld
      *  @throws NoSuchRealmException If the id does not correspond
      *          to any known class-realm.
      */
-    ClassRealmImpl getRealmImpl(String id) throws NoSuchRealmException
+    DefaultClassRealm getRealmImpl(String id) throws NoSuchRealmException
     {
-        return (ClassRealmImpl) getRealm( id );
+        return (DefaultClassRealm) getRealm( id );
     }
 
     /** Retrieve the collection of all <code>ClassRealm</code>s

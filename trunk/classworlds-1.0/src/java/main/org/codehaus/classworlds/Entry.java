@@ -57,7 +57,7 @@ class Entry implements Comparable
     // ------------------------------------------------------------
 
     /** The realm. */
-    private final ClassRealmImpl realm;
+    private final DefaultClassRealm realm;
 
     /** The package name. */
     private final String pkgName;
@@ -71,7 +71,7 @@ class Entry implements Comparable
      *  @param realm The realm.
      *  @param pkgName The package name.
      */
-    Entry(ClassRealmImpl realm,
+    Entry(DefaultClassRealm realm,
           String pkgName)
     {
         this.realm = realm;
@@ -86,7 +86,7 @@ class Entry implements Comparable
      *
      *  @return The realm.
      */
-    ClassRealmImpl getRealm()
+    DefaultClassRealm getRealm()
     {
         return this.realm;
     }
