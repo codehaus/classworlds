@@ -13,7 +13,7 @@
   </organization>
   <inceptionYear>2002</inceptionYear>
   <package>org.codehaus.classworlds</package>
-  <shortDescription>classworlds: Java(tm) ClassLoader Management Framework</shortDescription>
+  <shortDescription>Classworlds: Java(tm) ClassLoader Management Framework</shortDescription>
   <logo>http://images.werken.com/classworlds.gif</logo>
 
   <description>
@@ -21,7 +21,7 @@
 
   <url>http://classworlds.codehaus.org/</url>
   <siteAddress>classworlds.codehaus.org</siteAddress>
-  <siteDirectory>/www/classworlds.codehaus.org</siteDirectory>
+  <siteDirectory>/home/projects/classworlds/public_html</siteDirectory>
 
   <mailingLists>
     <mailingList>
@@ -46,8 +46,8 @@
 
 
   <repository>
-    <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/scm/cvspublic/:classworlds</connection>
-    <url>http://cvs.classworlds.codehaus.org/</url>
+    <connection>scm:cvs:pserver:anonymous@cvs.classworlds.codehaus.org:/scm/classworlds:classworlds</connection>
+    <url>http://cvs.classworlds.codehaus.org/classworlds</url>
   </repository>
 
   <developers>
@@ -81,7 +81,16 @@
         <role>Developer</role>
       </roles>
     </developer>
-
+    
+    <developer>
+      <name>Jason Dillon</name>
+      <id>user57</id>
+      <email>jason@planet57.com</email>
+      <organization>Core Developers Network</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
   </developers>
 
   <dependencies>
