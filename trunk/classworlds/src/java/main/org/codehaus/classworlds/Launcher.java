@@ -85,8 +85,15 @@ public class Launcher
 
     protected ClassWorld world;
 
+    private int exitCode = 0;
+
     public Launcher()
     {
+    }
+
+    public int getExitCode()
+    {
+        return exitCode;
     }
 
     public void setAppMain( String mainClassName, String mainRealmName )
@@ -174,48 +181,18 @@ public class Launcher
         throws ClassNotFoundException, NoSuchMethodException, NoSuchRealmException
     {
         Method[] methods = getMainClass().getMethods();
+        Class cwClass = getMainRealm().loadClass( ClassWorld.class.getName() );
 
-        for ( int i = 0; i < methods.length; ++i )
+        Method m = getMainClass().getMethod( "main", new Class[] { String[].class, cwClass } );
+
+        int modifiers = m.getModifiers();
+
+        if ( Modifier.isStatic( modifiers ) && Modifier.isPublic( modifiers ) )
         {
-            final Method method = methods[i];
-
-            if ( !"main".equals( method.getName() ) )
+            if ( m.getReturnType() == Integer.TYPE || m.getReturnType() == Void.TYPE )
             {
-                continue;
+                return m;
             }
-
-            int modifiers = method.getModifiers();
-
-            if ( !( Modifier.isStatic( modifiers ) && Modifier.isPublic( modifiers ) ) )
-            {
-                continue;
-            }
-
-            if ( method.getReturnType() != Void.TYPE )
-            {
-                continue;
-            }
-
-            Class[] paramTypes = method.getParameterTypes();
-
-            if ( paramTypes.length != 2 )
-            {
-                continue;
-            }
-
-            if ( paramTypes[0] != String[].class )
-            {
-                continue;
-            }
-
-            Class cwClass = getMainRealm().loadClass( ClassWorld.class.getName() );
-            Class cw2Class = ClassWorld.class;
-            if ( paramTypes[1] != cwClass )
-            {
-                continue;
-            }
-
-            return method;
         }
 
         throw new NoSuchMethodException( "public static void main(String[] args, ClassWorld world)" );
@@ -232,40 +209,16 @@ public class Launcher
     protected Method getMainMethod()
         throws ClassNotFoundException, NoSuchMethodException, NoSuchRealmException
     {
-        Method[] methods = getMainClass().getMethods();
+        Method m = getMainClass().getMethod( "main", new Class[] { String[].class } );
 
-        for ( int i = 0; i < methods.length; ++i )
+        int modifiers = m.getModifiers();
+
+        if ( Modifier.isStatic( modifiers ) && Modifier.isPublic( modifiers ) )
         {
-            if ( !"main".equals( methods[i].getName() ) )
+            if ( m.getReturnType() == Integer.TYPE || m.getReturnType() == Void.TYPE )
             {
-                continue;
+                return m;
             }
-
-            int modifiers = methods[i].getModifiers();
-
-            if ( !( Modifier.isStatic( modifiers ) && Modifier.isPublic( modifiers ) ) )
-            {
-                continue;
-            }
-
-            if ( methods[i].getReturnType() != Void.TYPE )
-            {
-                continue;
-            }
-
-            Class[] paramTypes = methods[i].getParameterTypes();
-
-            if ( paramTypes.length != 1 )
-            {
-                continue;
-            }
-
-            if ( paramTypes[0] != String[].class )
-            {
-                continue;
-            }
-
-            return methods[i];
         }
 
         throw new NoSuchMethodException( "public static void main(String[] args) in " + getMainClass() );
@@ -347,7 +300,11 @@ public class Launcher
 
         Thread.currentThread().setContextClassLoader( cl );
 
-        mainMethod.invoke( mainClass, new Object[]{args, getWorld()} );
+        Object ret = mainMethod.invoke( mainClass, new Object[]{args, getWorld()} );
+        if ( ret instanceof Integer )
+        {
+            exitCode = ( ( Integer ) ret ).intValue();
+        }
     }
 
     /**
@@ -381,7 +338,11 @@ public class Launcher
 
         Thread.currentThread().setContextClassLoader( mainRealm.getClassLoader() );
 
-        mainMethod.invoke( mainClass, new Object[]{args} );
+        Object ret = mainMethod.invoke( mainClass, new Object[]{args} );
+        if ( ret instanceof Integer )
+        {
+            exitCode = ( ( Integer ) ret ).intValue();
+        }
     }
 
     // ------------------------------------------------------------
@@ -389,12 +350,34 @@ public class Launcher
     // ------------------------------------------------------------
 
     /**
+     * Launch the launcher from the command line.
+     * Will exit using System.exit with an exit code of 0 for success, 100 if there was an unknown exception,
+     * or some other code for an application error.
+     *
+     * @param args The application command-line arguments.
+     */
+    public static void main( String[] args )
+    {
+        try
+        {
+            int exitCode = mainWithExitCode( args );
+            System.exit( exitCode );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+            System.exit( 100 );
+        }
+    }
+
+    /**
      * Launch the launcher.
      *
      * @param args The application command-line arguments.
+     * @return an integer exit code
      * @throws Exception If an error occurs.
      */
-    public static void main( String[] args )
+    public static int mainWithExitCode( String[] args )
         throws Exception
     {
         String classworldsConf = System.getProperty( CLASSWORLDS_CONF );
@@ -462,5 +445,7 @@ public class Launcher
             // Else just toss the ITE
             throw e;
         }
+
+        return launcher.getExitCode();
     }
 }
