@@ -228,7 +228,7 @@ class ClassRealmImpl implements ClassRealm
      */
     public Class loadClass( String name ) throws ClassNotFoundException
     {
-        if ( name.startsWith( "com.werken.classworlds." ) )
+        if ( name.startsWith( "org.codehaus.classworlds." ) )
         {
             return getWorld().loadClass( name );
         }
