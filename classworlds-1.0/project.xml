@@ -47,8 +47,8 @@
 
 
   <repository>
-    <connection>scm:cvs::pserver:anonymous@cvs.codehaus.org:/scm/cvs/:classworlds</connection>
-    <url>http://cvs.codehaus.org/viewcvs.cgi/classworlds/?cvsroot=classworlds</url>
+    <connection>scm:cvs::pserver:anonymous@cvs.codehaus.org:/scm/cvspublic/:classworlds</connection>
+    <url>http://cvs.classworlds.codehaus.org/</url>
   </repository>
 
   <developers>
