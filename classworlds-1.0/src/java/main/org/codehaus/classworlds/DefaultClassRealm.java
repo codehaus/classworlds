@@ -247,8 +247,18 @@ class DefaultClassRealm implements ClassRealm
         {
             return loadClassDirect( name );
         }
-
-        return sourceRealm.loadClass( name );
+        else
+        {
+            try
+            {
+                return sourceRealm.loadClass( name );
+            }
+            catch ( ClassNotFoundException cnfe )
+            {
+                // If we can't find it in an import, try loading directly.
+                return loadClassDirect( name );
+            }
+        }
     }
 
     /** Load a class.  First try this realm's class loader, then
@@ -353,8 +363,11 @@ class DefaultClassRealm implements ClassRealm
         Enumeration direct = classLoader.findResourcesFromClassLoader( name );
       
         while ( direct.hasMoreElements() )
+        {
             resources.addElement( direct.nextElement() );
-
+        }
+        
+        // Find resources from the parent realm.
         if ( parent != null )
         {
             Enumeration parent = getParent().getResources( name );
@@ -364,7 +377,7 @@ class DefaultClassRealm implements ClassRealm
         }
         
         // TODO: get resources from imports too!
-
+        
         return resources.elements();
     }
     
