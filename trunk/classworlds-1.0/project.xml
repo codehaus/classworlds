@@ -6,7 +6,7 @@
 
   <name>classworlds</name>
   <id>classworlds</id>
-  <currentVersion>1.0-rc3</currentVersion>
+  <currentVersion>1.0</currentVersion>
   <organization>
     <name>The Codehaus</name>
     <url>http://codehaus.org/</url>
