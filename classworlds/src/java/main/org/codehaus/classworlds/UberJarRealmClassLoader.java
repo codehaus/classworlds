@@ -309,14 +309,6 @@ public class UberJarRealmClassLoader
         return null;
     }
 
-    protected Class loadClass( String name, boolean resolve )
-        throws ClassNotFoundException
-    {
-
-        //!!!!!
-        return null;
-    }
-
     private byte[] readStream( InputStream in ) throws IOException
     {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
