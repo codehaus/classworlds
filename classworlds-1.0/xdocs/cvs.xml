@@ -37,12 +37,8 @@
 <source>
     export CVS_RSH=ssh
 
-    cvs -z3 -dDEVELOPERNAME@cvs.codehaus.org:/scm/cvs co classworlds
+    cvs -z3 -ddevelopername@cvs.codehaus.org:/scm/cvs co classworlds
 </source>
-
-   <p>
-   where DEVELOPERNAME is replaced with your codehaus login name.
-   </p>
 
     </section>
   </body>
