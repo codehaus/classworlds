@@ -142,6 +142,13 @@ public class ClassWorld
         return realm;
     }
 
+    public void disposeRealm(String id) throws NoSuchRealmException
+    {
+        ClassRealm realm = getRealm( id );
+        
+        realms.remove(id);
+    }
+
     /** Retrieve a <code>ClassRealm</code> by its id.
      *
      *  @param id The id.
