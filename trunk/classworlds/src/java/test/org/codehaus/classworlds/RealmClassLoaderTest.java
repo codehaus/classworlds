@@ -13,13 +13,21 @@ import java.util.Enumeration;
 public class RealmClassLoaderTest
     extends TestCase
 {
+    private ClassWorld world;
+    
+    private ClassRealm realm;
+
     private RealmClassLoader classLoader;
 
     public void setUp()
         throws Exception
     {
-        classLoader = new RealmClassLoader();
+        this.world = new ClassWorld();
 
+        this.realm = this.world.newRealm( "realm" );
+
+        this.classLoader = (RealmClassLoader) this.realm.getClassLoader();
+        
         classLoader.addConstituent( getJarUrl( "component0-1.0.jar" ) );
     }
 

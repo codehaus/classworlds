@@ -46,82 +46,220 @@ package org.codehaus.classworlds;
 
  */
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 
-/**
- * Classloader for <code>ClassRealm</code>s.
+/** Classloader for <code>ClassRealm</code>s.
  *
- * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
- * @version $Id$
+ *  @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
+ *
+ *  @version $Id$
  */
-public class RealmClassLoader
+class RealmClassLoader
     extends URLClassLoader
 {
-    public RealmClassLoader()
+    // ------------------------------------------------------------
+    //     Instance members
+    // ------------------------------------------------------------
+
+    /** The realm. */
+    protected DefaultClassRealm realm;
+
+    // ------------------------------------------------------------
+    //     Constructors
+    // ------------------------------------------------------------
+
+    /** Construct.
+     *
+     *  @param realm The realm for which this loads.
+     */
+    RealmClassLoader(DefaultClassRealm realm)
     {
-        super( new URL[0], ClassLoader.getSystemClassLoader() );
+        this( realm, null );
     }
 
-    public void addConstituent( URL constituent )
+    /** Construct.
+     *
+     *  @param realm The realm for which this loads.
+     *
+     *  @param classLoader The parent ClassLoader.
+     */
+    RealmClassLoader(DefaultClassRealm realm, ClassLoader classLoader)
+    {
+        super( new URL[0], classLoader );
+        this.realm = realm;
+    }
+
+    // ------------------------------------------------------------
+    //     Instance methods
+    // ------------------------------------------------------------
+
+    /** Retrieve the realm.
+     *
+     *  @return The realm.
+     */
+    DefaultClassRealm getRealm()
+    {
+        return this.realm;
+    }
+
+    /** Add a constituent to this realm for locating classes.
+     *  If the url definition ends in .class its a BytesURLStreamHandler
+     *  so use defineClass insead. addURL is still called for byte[]
+     *  even though it has no affect and we use defineClass instead,
+     *  this is for consistentency and to allow access to the class
+     *  with getURLs()
+     *
+     *  @param constituent URL to contituent jar or directory.
+     */
+    void addConstituent(URL constituent)
     {
         String urlStr = constituent.toExternalForm();
-
-        if ( urlStr.startsWith( "jar:" ) && urlStr.endsWith( "!/" ) )
+        if (!urlStr.endsWith(".class"))
         {
-            urlStr = urlStr.substring( 4, urlStr.length() - 2 );
+            if ( urlStr.startsWith( "jar:" )
+                 &&
+                 urlStr.endsWith( "!/" ) )
+            {
+                urlStr = urlStr.substring( 4,
+                                           urlStr.length() - 2 );
 
+                try
+                {
+                    constituent = new URL( urlStr );
+                }
+                catch (MalformedURLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            addURL( constituent );
+        }
+        else
+        {
             try
             {
-                constituent = new URL( urlStr );
+                byte[] b = getBytesToEndOfStream( new DataInputStream( constituent.openStream() ) );
+                int start = urlStr.lastIndexOf("byteclass") + 10;
+                int end = urlStr.lastIndexOf(".class");
+                
+                String className = urlStr.substring(start, end);
+                
+                super.defineClass(className, b, 0, b.length);
+                
+                addURL(constituent);
             }
-            catch ( MalformedURLException e )
+            catch (IOException e)
             {
                 e.printStackTrace();
             }
         }
-
-        addURL( constituent );
     }
 
-    // We are loading from this classloader first
 
-    public synchronized Class loadClass( String className )
-        throws ClassNotFoundException
+    /**
+     *  Helper method for addConstituent that reads in a DataInputStream and returns it as a byte[]
+     *  It attempts to use in.available - the size of the file - else defaults to 2048
+     */
+    public byte[] getBytesToEndOfStream(DataInputStream in) throws IOException
     {
-        Class c = findLoadedClass( className );
-
-        if ( c == null )
+        final int chunkSize = (in.available() > 0) ? in.available() : 2048;
+        byte[] buf = new byte[chunkSize];
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream(chunkSize);
+        int count;
+        
+        while ((count=in.read(buf)) != -1)
         {
-            try
-            {
-                c = findClass( className );
-            }
-            catch ( ClassNotFoundException e )
-            {
-                c = getParent().loadClass( className );
-            }
+            byteStream.write(buf, 0, count);
         }
-
-        return c;
+        return byteStream.toByteArray();
     }
 
-    // ----------------------------------------------------------------------
-    // We want to look in this classloader first and not go to the parent
-    // classloader as we are working within the context of realms. So we look
-    // here first then check the system classloader.
-    // ----------------------------------------------------------------------
-
-    public URL getResource( String name )
+    /** Load a class directly from this classloader without
+     *  defering through any other <code>ClassRealm</code>.
+     *
+     *  @param name The name of the class to load.
+     *
+     *  @return The loaded class.
+     *
+     *  @throws ClassNotFoundException If the class could not be found.
+     */
+    Class loadClassDirect(String name) throws ClassNotFoundException
     {
-        URL url = findResource( name );
+        return super.loadClass( name, true );
+    }
 
-        if ( url == null )
-        {
-            url = getSystemResource( name );
-        }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    //     java.lang.ClassLoader
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        return url;
+    /** Load a class.
+     *
+     *  @param name The name of the class to load.
+     *  @param resolve If <code>true</code> then resolve the class.
+     *
+     *  @return The loaded class.
+     *
+     *  @throws ClassNotFoundException If the class cannot be found.
+     */
+    protected Class loadClass(String name,
+                              boolean resolve) throws ClassNotFoundException
+    {
+        return getRealm().loadClass( name );
+    }
+
+    /** Retrieve the <code>URL</code>s used by this <code>ClassLoader</code>.
+     *
+     *  @return The urls.
+     */
+    public URL[] getURLs()
+    {
+        return super.getURLs();
+    }
+
+    /** Find a resource within this ClassLoader only (don't delegate to the parent).
+     *
+     *  @return The resource.
+     */
+    public URL findResource( String name )
+    {
+        return super.findResource( name );
+    }
+
+    public URL getResource(String name)
+    {
+        return getRealm().getResource( name );
+    }
+    
+    /** Get a resource from this ClassLoader, and don't search the realm.
+     *  Otherwise we'd recurse indefinitely.
+     *
+     *  @return The resource.
+     */
+    public URL getResourceDirect(String name)
+    {
+        return super.getResource( name );
+    }
+    
+    public Enumeration findResources(String name) throws IOException
+    {
+        return getRealm().findResources( name );
+    }
+
+    /** Find resources from this ClassLoader, and don't search the realm.
+     *  Otherwise we'd recurse indefinitely.
+     *
+     *  @return The resource.
+     */
+    public Enumeration findResourcesDirect(String name)
+        throws IOException
+    {
+        return super.findResources( name );
     }
 }
