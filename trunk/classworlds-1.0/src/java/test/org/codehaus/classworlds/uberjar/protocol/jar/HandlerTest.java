@@ -11,7 +11,7 @@ public class HandlerTest
     public void setUp()
     {
         System.setProperty( "java.protocol.handler.pkgs",
-                            "org.codehaus.classworlds.protocol" );
+                            "org.codehaus.classworlds.uberjar.protocol" );
     }
 
     public void testSimpleImplicit()
