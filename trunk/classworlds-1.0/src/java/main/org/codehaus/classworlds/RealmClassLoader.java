@@ -78,7 +78,6 @@ class RealmClassLoader
     {
         super( new URL[0] );
         this.realm = realm;
-        this.realm = realm;
     }
 
     // ------------------------------------------------------------
