@@ -193,12 +193,10 @@ class ClassRealmImpl implements ClassRealm
     ClassRealmImpl locateSourceRealm( String classname )
     {
         Iterator entryIter = this.imports.iterator();
-        //TODO: Move this declaration inside loop
-        Entry eachEntry = null;
-
+        
         while ( entryIter.hasNext() )
         {
-            eachEntry = (Entry) entryIter.next();
+            Entry eachEntry = (Entry) entryIter.next();
 
             if ( eachEntry.matches( classname ) )
             {
