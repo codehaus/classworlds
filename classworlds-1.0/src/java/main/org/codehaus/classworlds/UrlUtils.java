@@ -1,7 +1,5 @@
 package org.codehaus.classworlds;
 
-import java.net.URL;
-
 /**
  *
  * 

@@ -46,10 +46,13 @@ package org.codehaus.classworlds;
 
  */
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.TreeSet;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.Vector;
 
 /** Implementation of <code>ClassRealm</code>.
  *
@@ -239,7 +242,7 @@ class DefaultClassRealm implements ClassRealm
         }
 
         DefaultClassRealm sourceRealm = locateSourceRealm( name );
-
+        
         if ( sourceRealm == this )
         {
             return loadClassDirect( name );
@@ -248,7 +251,8 @@ class DefaultClassRealm implements ClassRealm
         return sourceRealm.loadClass( name );
     }
 
-    /** Load a class.
+    /** Load a class.  First try this realm's class loader, then
+     *  the parent's if there is one.
      *
      *  @param name The name of the class to load.
      *
@@ -258,9 +262,6 @@ class DefaultClassRealm implements ClassRealm
      */
     Class loadClassDirect( String name ) throws ClassNotFoundException
     {
-        // 1. Try this realm's ClassLoader.
-        // 2. If the realm has a parent try the parent's ClassLoader.
-
         Class clazz = null;
 
         try
@@ -293,6 +294,7 @@ class DefaultClassRealm implements ClassRealm
     {
         name = UrlUtils.normalizeUrlPath( name );
 
+        // Search imports *first*.
         DefaultClassRealm sourceRealm = locateSourceRealm( name );
 
         if ( sourceRealm == this )
@@ -309,7 +311,7 @@ class DefaultClassRealm implements ClassRealm
         // 1. Try this realm's ClassLoader.
         // 2. If the realm has a parent try the parent's ClassLoader.
 
-        URL resource = this.classLoader.findResource( name );
+        URL resource = this.classLoader.getResourceFromClassLoader( name );
 
         if ( resource == null
              &&
@@ -326,9 +328,49 @@ class DefaultClassRealm implements ClassRealm
      */
     public ClassRealm createChildRealm( String id )
     {
-        ClassRealm childRealm = new DefaultClassRealm( getWorld(), id, parentClassLoader );
+        /* Don't pass along the parent ClassLoader, because the child realm
+         * will default to it.  Instead, the child realm will fall back on this
+         * realm which will have the class loader.
+         */
+        ClassRealm childRealm = new DefaultClassRealm( getWorld(), id, null );
         childRealm.setParent( this );
 
         return childRealm;
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public Enumeration findResources(String name)
+        throws IOException
+    {
+        name = UrlUtils.normalizeUrlPath( name );
+ 
+        Vector resources = new Vector();
+        
+        // Attempt to load directly first, then go to the imported packages.
+        Enumeration direct = classLoader.findResourcesFromClassLoader( name );
+      
+        while ( direct.hasMoreElements() )
+            resources.addElement( direct.nextElement() );
+
+        if ( parent != null )
+        {
+            Enumeration parent = getParent().getResources( name );
+            
+            while ( parent.hasMoreElements() )
+                resources.addElement( parent.nextElement() );
+        }
+        
+        // TODO: get resources from imports too!
+
+        return resources.elements();
+    }
+    
+    public Enumeration getResources(String name)
+        throws IOException
+    {
+        return classLoader.getResources( name );
     }
 }
