@@ -72,7 +72,27 @@ public class LauncherTest extends TestCase
     {
         this.launcher = null;
     }
-
+    
+    public void testConfigure_Invalid_Null() throws Exception
+    {
+        try {
+            launcher.configure( null );
+            fail( "Configure accepted a null stream" );
+        }
+        catch (Exception ignore) {}
+    }
+    
+    public void testConfigure_Invalid_NoSuchFile() throws Exception
+    {
+        System.setProperty("classworlds.conf", "some-file-that-does-not-exist");
+        
+        try {
+            Launcher.main(new String[0]);
+            fail( "Launcher.main accepted invalid file for classworlds.conf" );
+        }
+        catch (Exception ignore) {}
+    }
+    
     public void testConfigure_Valid() throws Exception
     {
         launcher.configure( getConfigPath( "valid-launch.conf" ) );
@@ -87,7 +107,7 @@ public class LauncherTest extends TestCase
         assertEquals( "app",
                       launcher.getMainRealm().getId() );
     }
-
+    
     public void testLaunch_ValidStandard() throws Exception
     {
         launcher.configure( getConfigPath( "valid-launch.conf" ) );
@@ -135,6 +155,6 @@ public class LauncherTest extends TestCase
     private FileInputStream getConfigPath(String name)
         throws Exception
     {
-        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "test-data" ), name ) ) ;
+        return new FileInputStream( new File( new File( new File( System.getProperty( "basedir" ), "src" ), "test-data" ), name ) ) ;
     }
 }

@@ -49,9 +49,11 @@ package org.codehaus.classworlds;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.net.MalformedURLException;
 
 /** Command-line invokable application launcher.
@@ -429,15 +431,31 @@ public class Launcher
         InputStream is = null;
 
         Launcher launcher = new Launcher();
-
+        
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        
         if ( classworldsConf != null )
         {
-            is = new FileInputStream( classworldsConf );
+            // First try loading a file (for compatibility)
+            try
+            {
+                is = new FileInputStream( classworldsConf );
+            }
+            catch ( FileNotFoundException e )
+            {
+                // Then try a resource
+                URL url = cl.getResource( classworldsConf );
+                if ( url == null )
+                {
+                    // Or finally a vanilla URL
+                    url = new URL( classworldsConf );
+                }
+                
+                is = url.openStream();
+            }
         }
         else
         {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
             if ( "true".equals( System.getProperty( "classworlds.bootstrapped" ) ) )
             {
                 is = cl.getResourceAsStream( UBERJAR_CONF_DIR + CLASSWORLDS_CONF );

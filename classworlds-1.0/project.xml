@@ -26,24 +26,23 @@
   <mailingLists>
     <mailingList>
       <name>classworlds users</name>
-      <archive>http://lists.codehaus.org/pipermail/classworlds-user/</archive>
-      <subscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-user</subscribe>
-      <unsubscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-user</unsubscribe>
+      <archive>http://archive.classworlds.codehaus.org/user</archive>
+      <subscribe>user-subscribe@classworlds.codehaus.org</subscribe>
+      <subscribe>user-unsubscribe@classworlds.codehaus.org</subscribe>
     </mailingList>
     <mailingList>
       <name>classworlds developers</name>
-      <archive>http://lists.codehaus.org/pipermail/classworlds-dev/</archive>
-      <subscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-dev</subscribe>
-      <unsubscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-dev</unsubscribe>
+      <archive>http://archive.classworlds.codehaus.org/dev</archive>
+      <subscribe>dev-subscribe@classworlds.codehaus.org</subscribe>
+      <subscribe>dev-unsubscribe@classworlds.codehaus.org</subscribe>
     </mailingList>
     <mailingList>
       <name>classworlds commit messages</name>
-      <archive>http://lists.codehaus.org/pipermail/classworlds-scm/</archive>
-      <subscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-scm</subscribe>
-      <unsubscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-scm</unsubscribe>
+      <archive>http://archive.classworlds.codehaus.org/scm</archive>
+      <subscribe>scm-subscribe@classworlds.codehaus.org</subscribe>
+      <subscribe>scm-unsubscribe@classworlds.codehaus.org</subscribe>
     </mailingList>
   </mailingLists>
-
 
   <repository>
     <connection>scm:cvs:pserver:anonymous@cvs.classworlds.codehaus.org:/scm/classworlds:classworlds</connection>
@@ -72,7 +71,7 @@
       </roles>
     </developer>
 
-	<developer>
+    <developer>
       <name>Ben Walding</name>
       <id>bwalding</id>
       <email>ben@walding.com</email>
@@ -138,9 +137,6 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
-      <excludes>
-        <exclude>**/LauncherTest.java</exclude>
-      </excludes>
     </unitTest>
 
     <resources>
