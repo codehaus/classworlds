@@ -6,6 +6,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.codehaus.classworlds.uberjar.protocol.jar.JarUrlConnection;
+
 public class JarUrlConnectionTest
     extends TestCase
 {

@@ -167,10 +167,10 @@ public class ConfiguratorTest extends TestCase
         assertNotNull( world.getRealm( "maven" ) );
         assertNotNull( world.getRealm( "xml" ) );
 
-        ClassRealmImpl antRealm = world.getRealmImpl( "ant" );
-        ClassRealmImpl mavenRealm = world.getRealmImpl( "maven" );
-        ClassRealmImpl xmlRealm = world.getRealmImpl( "xml" );
-        ClassRealmImpl globRealm = world.getRealmImpl( "glob" );
+        DefaultClassRealm antRealm = world.getRealmImpl( "ant" );
+        DefaultClassRealm mavenRealm = world.getRealmImpl( "maven" );
+        DefaultClassRealm xmlRealm = world.getRealmImpl( "xml" );
+        DefaultClassRealm globRealm = world.getRealmImpl( "glob" );
 
         assertSame( antRealm,
                     antRealm.locateSourceRealm( "org.apache.tools.Ant" ) );

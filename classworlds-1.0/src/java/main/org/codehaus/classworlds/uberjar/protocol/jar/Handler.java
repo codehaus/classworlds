@@ -1,4 +1,4 @@
-package org.codehaus.classworlds.protocol.jar;
+package org.codehaus.classworlds.uberjar.protocol.jar;
 
 /*
  $Id$
@@ -96,7 +96,7 @@ public class Handler
     //     Instance methods
     // ----------------------------------------------------------------------
 
-    /** @see URLStreamHandler
+    /** @see java.net.URLStreamHandler
      */
     public URLConnection openConnection(URL url)
         throws IOException
@@ -104,7 +104,7 @@ public class Handler
         return new JarUrlConnection( url );
     }
 
-    /** @see URLStreamHandler
+    /** @see java.net.URLStreamHandler
      */
     public void parseURL(URL url,
                          String spec,

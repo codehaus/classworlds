@@ -1,4 +1,4 @@
-package org.codehaus.classworlds.protocol.jar;
+package org.codehaus.classworlds.uberjar.protocol.jar;
 
 /*
  $Id$
@@ -92,7 +92,7 @@ public class JarUrlConnection
      *
      *  @param url Target URL of the connections.
      *
-     *  @throws IOException If an error occurs while attempting to initialize
+     *  @throws java.io.IOException If an error occurs while attempting to initialize
      *          the connection.
      */
     JarUrlConnection( URL url )
@@ -197,7 +197,7 @@ public class JarUrlConnection
 
     /** Setup the <code>InputStream</code> purely from the base resource.
      *
-     *  @throws IOException If an I/O error occurs.
+     *  @throws java.io.IOException If an I/O error occurs.
      */
     protected void setupBaseResourceInputStream()
         throws IOException
@@ -207,7 +207,7 @@ public class JarUrlConnection
 
     /** Setup the <code>InputStream</code> for URL with nested segments.
      *
-     *  @throws IOException If an I/O error occurs.
+     *  @throws java.io.IOException If an I/O error occurs.
      */
     protected void setupPathedInputStream()
         throws IOException
@@ -231,7 +231,7 @@ public class JarUrlConnection
      *
      *  @return The input-stream to the segment.
      *
-     *  @throws IOException If an I/O error occurs.
+     *  @throws java.io.IOException If an I/O error occurs.
      */
     protected InputStream getSegmentInputStream( InputStream baseIn,
                                                  String segment )
@@ -272,7 +272,7 @@ public class JarUrlConnection
 
     /**
      * @return JarFile
-     * @throws IOException
+     * @throws java.io.IOException
      * @see java.net.JarURLConnection#getJarFile()
      */
     public JarFile getJarFile() throws IOException

@@ -21,7 +21,7 @@ public class EntryTest extends TestCase
     public void testCompareTo() throws Exception
     {
         ClassWorld cw = new ClassWorld();
-        ClassRealmImpl r = (ClassRealmImpl) cw.newRealm("test1");
+        DefaultClassRealm r = (DefaultClassRealm) cw.newRealm("test1");
 
         Entry entry1 = new Entry(r, "org.test");
         Entry entry2 = new Entry(r, "org.test.impl");
@@ -36,8 +36,8 @@ public class EntryTest extends TestCase
     public void testEquals() throws Exception
     {
         ClassWorld cw = new ClassWorld();
-        ClassRealmImpl r1 = (ClassRealmImpl) cw.newRealm("test1");
-        ClassRealmImpl r2 = (ClassRealmImpl) cw.newRealm("test2");
+        DefaultClassRealm r1 = (DefaultClassRealm) cw.newRealm("test1");
+        DefaultClassRealm r2 = (DefaultClassRealm) cw.newRealm("test2");
 
         Entry entry1 = new Entry(r1, "org.test");
         Entry entry2 = new Entry(r2, "org.test");

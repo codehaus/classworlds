@@ -1,4 +1,4 @@
-package org.codehaus.classworlds.boot;
+package org.codehaus.classworlds.uberjar.boot;
 
 /*
  $Id$

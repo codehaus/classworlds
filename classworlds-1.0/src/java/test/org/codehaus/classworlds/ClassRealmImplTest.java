@@ -85,7 +85,7 @@ public class ClassRealmImplTest extends TestCase
 
     public void testLocateSourceRealm_NoImports() throws Exception
     {
-        ClassRealmImpl realm = new ClassRealmImpl( this.world,
+        DefaultClassRealm realm = new DefaultClassRealm( this.world,
                                                    "foo" );
 
         assertSame( realm,
@@ -94,7 +94,7 @@ public class ClassRealmImplTest extends TestCase
 
     public void testLocateSourceRealm_SimpleImport() throws Exception
     {
-        ClassRealmImpl mainRealm = (ClassRealmImpl) this.world.newRealm( "main" );
+        DefaultClassRealm mainRealm = (DefaultClassRealm) this.world.newRealm( "main" );
 
         ClassRealm werkflowRealm = this.world.newRealm( "werkflow" );
 
@@ -119,7 +119,7 @@ public class ClassRealmImplTest extends TestCase
 
     public void testLocateSourceRealm_MultipleImport() throws Exception
     {
-        ClassRealmImpl mainRealm = (ClassRealmImpl) this.world.newRealm( "main" );
+        DefaultClassRealm mainRealm = (DefaultClassRealm) this.world.newRealm( "main" );
         
         ClassRealm werkflowRealm = this.world.newRealm( "werkflow" );
 
@@ -152,7 +152,7 @@ public class ClassRealmImplTest extends TestCase
 
     public void testLocateSourceRealm_Hierachy() throws Exception
     {
-        ClassRealmImpl mainRealm = (ClassRealmImpl) this.world.newRealm( "main" );
+        DefaultClassRealm mainRealm = (DefaultClassRealm) this.world.newRealm( "main" );
         
         ClassRealm fooRealm = this.world.newRealm( "foo" );
         ClassRealm fooBarRealm = this.world.newRealm( "fooBar" );
@@ -198,7 +198,7 @@ public class ClassRealmImplTest extends TestCase
         ClassRealm fooBarRealm = this.world.newRealm( "fooBar" );
         ClassRealm fooRealm = this.world.newRealm( "foo" );
 
-        ClassRealmImpl mainRealm = (ClassRealmImpl) this.world.newRealm( "main" );
+        DefaultClassRealm mainRealm = (DefaultClassRealm) this.world.newRealm( "main" );
         
         mainRealm.importFrom( "fooBarBaz",
                               "foo.bar.baz" );
