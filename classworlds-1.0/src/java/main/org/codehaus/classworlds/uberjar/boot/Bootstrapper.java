@@ -109,7 +109,7 @@ public class Bootstrapper
         throws Exception
     {
         System.setProperty( "java.protocol.handler.pkgs",
-                            "org.codehaus.classworlds.protocol" );
+                            "org.codehaus.classworlds.uberjar.protocol" );
 
         Bootstrapper bootstrapper = new Bootstrapper( args );
 
