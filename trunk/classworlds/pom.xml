@@ -1,57 +1,37 @@
-<project>
-  
+<model>
   <modelVersion>4.0.0</modelVersion>
   <groupId>classworlds</groupId>
   <artifactId>classworlds</artifactId>
+  <packaging>jar</packaging>
   <name>classworlds</name>
   <version>1.1-alpha-2-SNAPSHOT</version>
-  <organization>
-    <name>The Codehaus</name>
-    <url>http://codehaus.org/</url>
-    <logo>http://codehaus.org/codehaus-small.gif</logo>
-  </organization>
+  <description></description>
+  <url>http://cvs.classworlds.codehaus.org/</url>
   <inceptionYear>2002</inceptionYear>
-  <package>org.codehaus.classworlds</package>
-  <shortDescription>classworlds: Java(tm) ClassLoader Management Framework</shortDescription>
-  <logo>http://images.werken.com/classworlds.gif</logo>
-
-  <description>
-  </description>
-
-  <url>http://classworlds.codehaus.org/</url>
-  <siteAddress>classworlds.codehaus.org</siteAddress>
-  <siteDirectory>/www/classworlds.codehaus.org</siteDirectory>
-
   <mailingLists>
     <mailingList>
       <name>classworlds users</name>
-      <archive>http://lists.codehaus.org/pipermail/classworlds-user/</archive>
       <subscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-user</subscribe>
       <unsubscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-user</unsubscribe>
+      <archive>http://lists.codehaus.org/pipermail/classworlds-user/</archive>
     </mailingList>
     <mailingList>
       <name>classworlds developers</name>
-      <archive>http://lists.codehaus.org/pipermail/classworlds-dev/</archive>
       <subscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-dev</subscribe>
       <unsubscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-dev</unsubscribe>
+      <archive>http://lists.codehaus.org/pipermail/classworlds-dev/</archive>
     </mailingList>
     <mailingList>
       <name>classworlds commit messages</name>
-      <archive>http://lists.codehaus.org/pipermail/classworlds-scm/</archive>
       <subscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-scm</subscribe>
       <unsubscribe>http://lists.codehaus.org/mailman/listinfo/classworlds-scm</unsubscribe>
+      <archive>http://lists.codehaus.org/pipermail/classworlds-scm/</archive>
     </mailingList>
   </mailingLists>
-
-  <repository>
-    <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/scm/cvspublic/:classworlds</connection>
-    <url>http://cvs.classworlds.codehaus.org/</url>
-  </repository>
-
   <developers>
     <developer>
-      <name>bob mcwhirter</name>
       <id>bob</id>
+      <name>bob mcwhirter</name>
       <email>bob@werken.com</email>
       <organization>The Werken Company</organization>
       <roles>
@@ -59,17 +39,17 @@
       </roles>
     </developer>
     <developer>
-      <name>Jason van Zyl</name>
       <id>jvanzyl</id>
+      <name>Jason van Zyl</name>
       <email>jason@zenplex.com</email>
       <organization>Zenplex</organization>
       <roles>
         <role>Developer</role>
       </roles>
     </developer>
-	<developer>
-      <name>Ben Walding</name>
+    <developer>
       <id>bwalding</id>
+      <name>Ben Walding</name>
       <email>ben@walding.com</email>
       <organization>Walding Consulting Services</organization>
       <roles>
@@ -77,19 +57,21 @@
       </roles>
     </developer>
   </developers>
-
-  <!-- TODO: should not be needed -->
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-
   <build>
-    <!-- TODO: restructure to defaults? -->
     <sourceDirectory>src/java/main</sourceDirectory>
-    <unitTestSourceDirectory>src/java/test</unitTestSourceDirectory>
+    <testSourceDirectory>src/java/test</testSourceDirectory>
   </build>
-</project>
+  <organization>
+    <name>The Codehaus</name>
+    <url>http://codehaus.org/</url>
+  </organization>
+</model>
