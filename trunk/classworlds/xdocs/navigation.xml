@@ -6,7 +6,7 @@
 
   <body>
     <links>
-      <item name="The Werken Company" href="http://www.werken.com/"/>
+      <item name="The Codehaus" href="http://codehaus.org"/>
     </links>
     <menu name="classworlds">
       <item name="Overview"            href="/index.html"/> 
@@ -17,8 +17,7 @@
       <item name="FAQ"                 href="/faq.html"/>
 -->
       <item name="Releases"            href="/releases.html"/> 
-      <item name="CVS Access"          href="/cvs.html"/>
-      <item name="IRC"                 href="/irc.html"/>
+      <item name="CVS Access"          href="/cvs-usage.html"/>
       <item name="Blog"                href="http://blogs.codehaus.org/people/bob"/>
 <!--
       <item name="Papers"              href="/papers.html"/>

@@ -4,7 +4,7 @@
 
   <properties>
     <title>API Usage</title>
-    <author email="bob@eng.werken.com">bob mcwhirter</author>
+    <author email="bob@werken.com">bob mcwhirter</author>
   </properties>
 
   <body>
@@ -19,7 +19,7 @@
     <p>
     The core of the <code>classworlds</code> infrastructure is
     the 
-    <a href="apidocs/com/werken/classworlds/ClassWorld.html">ClassWorld</a>
+    <a href="apidocs/com/classworlds/classworlds/ClassWorld.html">ClassWorld</a>
     class.  An application must create a <code>ClassWorld</code> instance.
     It is advisable to store the instance as a singleton or some other
     handy location.
