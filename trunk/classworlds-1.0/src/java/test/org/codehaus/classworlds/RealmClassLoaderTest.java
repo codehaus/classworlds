@@ -16,7 +16,7 @@ public class RealmClassLoaderTest
         throws Exception
     {
         System.setProperty( "java.protocol.handler.pkgs",
-                            "org.codehaus.classworlds.protocol" );
+                            "org.codehaus.classworlds.uberjar.protocol" );
 
         System.setProperty( "classworlds.bootstrapped",
                             "true" );
