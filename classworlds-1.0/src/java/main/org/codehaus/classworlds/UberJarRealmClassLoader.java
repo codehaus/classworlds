@@ -50,11 +50,13 @@ import java.net.URL;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarEntry;
 
@@ -299,6 +301,38 @@ class UberJarRealmClassLoader
         }
 
         return null;
+    }
+    
+    public Enumeration findResourcesFromClassLoader(String name)
+    {
+        Vector list = new Vector();
+        URL resourceUrl = null;
+        
+        Iterator urlIter = this.urls.iterator();
+        URL eachUrl = null;
+        
+        while (urlIter.hasNext())
+        {
+            eachUrl = (URL) urlIter.next();
+            
+            if ( "jar".equals(eachUrl.getProtocol())
+                 ||
+                 eachUrl.toExternalForm().endsWith(".jar") )
+            {
+                resourceUrl = findResourceInJarStream(eachUrl, name);
+            }
+            else
+            {
+                resourceUrl = findResourceInDirectoryUrl(eachUrl, name);
+            }
+            
+            if (resourceUrl != null)
+            {
+                list.add(resourceUrl);
+            }
+        }
+        
+        return list.elements();
     }
 
     /** Find a resource that potentially exists within a JAR stream.
