@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<document>
+
+  <properties>
+    <author email="bob@eng.werken.com">bob mcwhirter</author>
+    <title>Releases</title>
+  </properties>
+
+  <body>
+    <section name="Official Builds">
+      <p>
+      Official builds can be found <a href="http://classworlds.werken.com/dists/">in the classworlds distribution directory</a>.
+      </p>
+
+      <p>
+      The latest official build is <b>1.0-rc1</b>.
+      </p>
+
+      <subsection name="Binary Distributions">
+        <ul>
+          <li><a href="http://classworlds.werken.com/dists/classworlds-1.0-rc1.zip">1.0-rc1 in zip format.</a></li>
+          <li><a href="http://classworlds.werken.com/dists/classworlds-1.0-rc1.tar.gz">1.0-rc1 in tar/gz format.</a></li>
+        </ul>
+      </subsection>
+
+      <subsection name="Source Distributions">
+        <ul>
+          <li><a href="http://classworlds.werken.com/dists/classworlds-1.0-rc1-src.zip">1.0-rc1 in zip format.</a></li>
+          <li><a href="http://classworlds.werken.com/dists/classworlds-1.0-rc1-src.tar.gz">1.0-rc1 in tar/gz format.</a></li>
+        </ul>
+      </subsection>
+
+    </section>
+
+  </body>
+
+</document>
+
