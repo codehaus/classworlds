@@ -166,4 +166,15 @@ class Entry implements Comparable
 
         return getPackageName().equals( that.getPackageName() );
     }
+    
+    /**
+     * <p>
+     *  Consistent with {@link #equals}, this method creates a hashCode
+     *  based on the packagename.
+     *  </p>
+     */
+    public int hashCode() 
+    {
+        return getPackageName().hashCode();
+    }
 }

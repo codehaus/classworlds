@@ -43,6 +43,8 @@ public class EntryTest extends TestCase
         Entry entry2 = new Entry(r2, "org.test");
 
         assertTrue("entry1 == entry2", entry1.equals(entry2));
+        assertTrue("entry1.hashCode() == entry2.hashCode()", entry1.hashCode() == entry2.hashCode());
     }
+    
 
 }
