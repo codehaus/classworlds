@@ -160,7 +160,7 @@ public class DefaultClassRealm
      *  This ensures we have a unifed URL resource model for all constituents.
      *  The code to cache to disk is commented out - maybe a property to choose which method?
      *
-     *  @param name class name
+     *  @param constituent class name
      *  @param b the class definition as a byte[]
      */
     public void addConstituent(String constituent,
@@ -213,8 +213,9 @@ public class DefaultClassRealm
     }
 
     public ClassRealm createChildRealm( String id )
+        throws DuplicateRealmException
     {
-        ClassRealm childRealm = new DefaultClassRealm( getWorld(), id );
+        ClassRealm childRealm = getWorld().newRealm( id );
 
         childRealm.setParent( this );
 
@@ -382,4 +383,44 @@ public class DefaultClassRealm
 
 		return resources.elements();
 	}
+
+    public void display()
+    {
+        ClassRealm cr = this;
+
+        System.out.println( "-----------------------------------------------------" );
+
+
+        showUrls( cr );
+
+        while( cr.getParent() != null )
+        {
+            System.out.println( "\n" );
+
+            cr = cr.getParent();
+
+            showUrls( cr );
+        }
+
+        System.out.println( "-----------------------------------------------------" );
+    }
+
+    private void showUrls( ClassRealm classRealm )
+    {
+        System.out.println( "this realm = " + classRealm.getId() );
+
+        URL[] urls = classRealm.getConstituents();
+
+        for ( int i = 0; i < urls.length; i++ )
+        {
+            System.out.println( "urls[" + i + "] = " + urls[i] );
+        }
+
+        System.out.println( "Number of imports: " + imports.size() );
+
+        for ( Iterator i = imports.iterator(); i.hasNext(); )
+        {
+            System.out.println( "import: " + i.next() );
+        }
+    }
 }

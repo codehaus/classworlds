@@ -283,28 +283,51 @@
     <first-group selected-file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/DefaultClassRealm.java">
       <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/RealmClassLoader.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="87" column="0" selection-start="3042" selection-end="3042" vertical-scroll-proportion="0.33410943">
+          <state line="62" column="6" selection-start="2493" selection-end="2493" vertical-scroll-proportion="-0.43333334">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/EmbeddedLauncher.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="72" column="13" selection-start="2964" selection-end="2964" vertical-scroll-proportion="-2.209546">
+          <state line="72" column="13" selection-start="2964" selection-end="2964" vertical-scroll-proportion="0.01904762">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/ClassWorld.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="58" column="13" selection-start="2373" selection-end="2373" vertical-scroll-proportion="0.060535505">
+          <state line="58" column="13" selection-start="2373" selection-end="2373" vertical-scroll-proportion="0.07857143">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/DefaultClassRealm.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="255" column="0" selection-start="7270" selection-end="7270" vertical-scroll-proportion="0.54598373">
+          <state line="360" column="17" selection-start="10305" selection-end="10305" vertical-scroll-proportion="0.29090908">
+            <folding>
+              <element signature="imports" expanded="true" />
+            </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/Launcher.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="75" column="13" selection-start="3028" selection-end="3028" vertical-scroll-proportion="0.016666668">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/Configurator.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="74" column="13" selection-start="2853" selection-end="2853" vertical-scroll-proportion="0.016666668">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/ClassRealm.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="82" column="38" selection-start="3041" selection-end="3041" vertical-scroll-proportion="0.6166667">
             <folding />
           </state>
         </provider>
@@ -335,24 +358,24 @@
     <option name="ADD_LABEL_ON_UNIT_TEST" value="true" />
   </component>
   <component name="PackagesPane">
-    <expanded_node url="org.codehaus" module="classworlds" type="package" />
-    <expanded_node url="" module="classworlds" type="module" />
     <expanded_node url="org" module="classworlds" type="package" />
+    <expanded_node url="org.codehaus" module="classworlds" type="package" />
     <expanded_node url="org.codehaus.classworlds" module="classworlds" type="package" />
+    <expanded_node url="" module="classworlds" type="module" />
   </component>
   <component name="ProjectPane">
-    <expanded_node url="file://$PROJECT_DIR$/src/java/main/org" module="classworlds" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src" module="classworlds" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/java/test/org/codehaus/classworlds" module="classworlds" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/java/test/org" module="classworlds" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/java" module="classworlds" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/java/test" module="classworlds" type="directory" />
+    <expanded_node url="" module="classworlds" type="module" />
     <expanded_node url="file://$PROJECT_DIR$" module="classworlds" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/java/test/org/codehaus" module="classworlds" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/java/test/org" module="classworlds" type="directory" />
-    <expanded_node url="" module="classworlds" type="module" />
     <expanded_node url="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds" module="classworlds" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/java/main" module="classworlds" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/java" module="classworlds" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src" module="classworlds" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/java/main/org/codehaus" module="classworlds" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/java/test" module="classworlds" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/java/test/org/codehaus/classworlds" module="classworlds" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/java/main" module="classworlds" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/java/main/org" module="classworlds" type="directory" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" splitterProportion="0.5">
@@ -459,7 +482,7 @@
     <option name="SHOW_INHERITED" value="false" />
     <option name="HIDE_NOT_PUBLIC" value="false" />
   </component>
-  <component name="Talios.JiraConfigurationComponent">
+  <component name="Talios.JiraConfigurationComponent" enableIssueTracking="false" autoRefresh="false" useExternalBrowser="false" refreshTimeout="60" annotateissues="false">
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -475,12 +498,12 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1277" y="0" width="1280" height="1021" extended-state="1" />
+    <frame x="1275" y="0" width="1288" height="1025" extended-state="1" />
     <editor active="true" />
     <layout>
-      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="-1" />
+      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="6" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.24938676" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.22908205" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32963374" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="sliding" type="sliding" visible="false" weight="0.33" order="8" />
@@ -489,7 +512,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4" order="3" />
-      <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="-1" />
+      <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="sliding" type="sliding" visible="false" weight="0.4" order="0" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
@@ -569,28 +592,51 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/RealmClassLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="87" column="0" selection-start="3042" selection-end="3042" vertical-scroll-proportion="0.33410943">
+        <state line="62" column="6" selection-start="2493" selection-end="2493" vertical-scroll-proportion="-0.43333334">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/EmbeddedLauncher.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="13" selection-start="2964" selection-end="2964" vertical-scroll-proportion="-2.209546">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/DefaultClassRealm.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="255" column="0" selection-start="7270" selection-end="7270" vertical-scroll-proportion="0.54598373">
+        <state line="72" column="13" selection-start="2964" selection-end="2964" vertical-scroll-proportion="0.01904762">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/ClassWorld.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="58" column="13" selection-start="2373" selection-end="2373" vertical-scroll-proportion="0.060535505">
+        <state line="58" column="13" selection-start="2373" selection-end="2373" vertical-scroll-proportion="0.07857143">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/DefaultClassRealm.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="360" column="17" selection-start="10305" selection-end="10305" vertical-scroll-proportion="0.29090908">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/Launcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="75" column="13" selection-start="3028" selection-end="3028" vertical-scroll-proportion="0.016666668">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/Configurator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="74" column="13" selection-start="2853" selection-end="2853" vertical-scroll-proportion="0.016666668">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/main/org/codehaus/classworlds/ClassRealm.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="38" selection-start="3041" selection-end="3041" vertical-scroll-proportion="0.6166667">
           <folding />
         </state>
       </provider>

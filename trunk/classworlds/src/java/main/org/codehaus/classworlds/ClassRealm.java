@@ -79,7 +79,8 @@ public interface ClassRealm
 
     void setParent( ClassRealm classRealm );
 
-    ClassRealm createChildRealm( String id );
+    ClassRealm createChildRealm( String id )
+        throws DuplicateRealmException;
 
     ClassLoader getClassLoader();
 
@@ -104,4 +105,6 @@ public interface ClassRealm
         throws IOException;
 
     InputStream getResourceAsStream( String name );
+
+    void display();
 }
