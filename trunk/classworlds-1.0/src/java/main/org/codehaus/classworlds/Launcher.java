@@ -469,16 +469,20 @@ public class Launcher
         
         launcher.configure( is );
         
-        try {
+        try
+        {
             launcher.launch(args);
         }
-        catch (InvocationTargetException e) {
+        catch (InvocationTargetException e) 
+        {
             // Decode ITE (if we can)
             Throwable t = e.getTargetException();
-            if (t instanceof Exception) {
+            if (t instanceof Exception) 
+            {
                 throw (Exception)t;
             }
-            if (t instanceof Error) {
+            if (t instanceof Error) 
+            {
                 throw (Error)t;
             }
             
