@@ -58,7 +58,7 @@ public class ConfiguratorInheritanceTest extends TestCase
     private Launcher launcher;
     private Configurator configurator;
 
-    public ConfiguratorInheritanceTest( String name )
+    public ConfiguratorInheritanceTest(String name)
     {
         super( name );
     }
@@ -78,7 +78,7 @@ public class ConfiguratorInheritanceTest extends TestCase
     public void testConfigure_Inheritance() throws Exception
     {
         this.configurator.configure( getConfigPath( "inheritance.conf" ) );
-
+        
         ClassWorld classWorld = launcher.getWorld();
         
         // Now let's look for a class in:
@@ -90,13 +90,13 @@ public class ConfiguratorInheritanceTest extends TestCase
         ClassRealm rootMavenPlugin = classWorld.getRealm( "root.maven.plugin" );
         
         // Comes form root.maven.plugin realm.
-        assertNotNull( rootMavenPlugin.loadClass( "c.C" ) );
+        assertNotNull( rootMavenPlugin.loadClass( "c.C") );
         
         // Comes from the root.maven realm.
-        assertNotNull( rootMavenPlugin.loadClass( "b.B" ) );
+        assertNotNull( rootMavenPlugin.loadClass( "b.B") );
         
         // Comes from the root realm.
-        assertNotNull( rootMavenPlugin.loadClass( "a.A" ) );
+        assertNotNull( rootMavenPlugin.loadClass( "a.A") );
         
         // Create a child realm that inherits from mommy.
         ClassRealm checkstyleRealm = rootMavenPlugin.createChildRealm( "checkstyle" );
@@ -111,21 +111,26 @@ public class ConfiguratorInheritanceTest extends TestCase
         
         // Now load a class that we hope to find in a parent realm.
         assertNotNull( checkstyleRealm.loadClass( "a.A" ) );
-
+        
+        // Now make sure the classloaders themselves are inheriting correctly.
+        assertNotNull( checkstyleRealm.getClassLoader().loadClass( "d.D" ) );
+        assertNotNull( checkstyleRealm.getClassLoader().loadClass( "a.A" ) );
+        
         // Test inherited search for resources.
         assertNotNull( checkstyleRealm.getResource( "a.properties" ) );
-
+        
     }
 
-    private FileInputStream getConfigPath( String name )
+    private FileInputStream getConfigPath(String name)
         throws Exception
     {
-        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "target/test-data" ), name ) );
+        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "target/test-data" ), name ) ) ;
     }
 
-    protected URL getJarUrl( String jarName )
-        throws MalformedURLException
+    protected URL getJarUrl(String jarName) throws MalformedURLException
     {
-        return new File( new File( System.getProperty( "basedir" ), "target/test-data" ), jarName ).toURL();
+        return new File( new File( System.getProperty( "basedir" ),
+                                   "target/test-data" ),
+                         jarName ).toURL();
     }
 }
