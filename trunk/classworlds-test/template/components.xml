@@ -1,0 +1,8 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.Component${count}</role>
+      <implementation>org.codehaus.plexus.DefaultComponent${count}</implementation>
+    </component>
+  </components>
+</component-set>
