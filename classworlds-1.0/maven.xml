@@ -1,5 +1,6 @@
 
 <project default="jar:jar"
+         xmlns:ant="jelly:ant"
          xmlns:j="jelly:core">
 
   <postGoal name="clover">
@@ -36,7 +37,7 @@
     
   </goal>
   
-  <goal name="classworlds:assemble" prereqs="classworlds:build-boot-jar,jar:jar">
+  <goal name="classworlds:assemble" prereqs="classworlds:build-boot-jar,jar:jar,build-abcd,build-test-data">
 
     <property name="assembly"   value="target/boot-assembly"/>
     <property name="worlds.inf" value="${assembly}/WORLDS-INF"/>
@@ -47,7 +48,7 @@
           tofile="${worlds.inf}/classworlds.jar"/>
 
     <copy todir="${libdir}">
-      <fileset dir="${basedir}/test-data/">
+      <fileset dir="${maven.build.dir}/test-data/">
         <include name="**/*.jar"/>
       </fileset>
     </copy>
@@ -110,14 +111,20 @@
   	<attainGoal name="uberjar-test"/>
   </preGoal>
   
-  <goal name="uberjar-test" prereqs="java:compile,jar.revolt">
+  <goal name="uberjar-test" prereqs="java:compile,jar.revolt,build-abcd,build-test-data">
   	<echo>Creating ${maven.build.dir}/uberjar-test.jar</echo>
   	
   	<!-- Copy the static jar files -->
   	<copy todir="${maven.build.dir}/uberjar/">
-  		<fileset dir="test-data/uberjar">
+  		<fileset dir="${maven.build.dir}/test-data/uberjar">
   			<includes name="**/*"/>
   		</fileset>
+		<fileset dir="${maven.build.dir}/test-data">
+  			<include name="a.jar"/>
+			<include name="b.jar"/>
+			<include name="c.jar"/>
+			<include name="d.jar"/>
+		</fileset>
   	</copy>
   	
   	<!-- Copy the bootstrap classes -->
@@ -131,13 +138,14 @@
   	</copy>
   	
   	<!-- Create the classworlds.jar -->
-    <jar
+    <ant:mkdir dir="${maven.build.dir}/uberjar/WORLDS-INF"/>
+    <ant:jar
       jarfile="${maven.build.dir}/uberjar/WORLDS-INF/classworlds.jar"
       basedir="${maven.build.dir}/classes"/>
   	
   	
   	<!-- Copy the revolt jar (contains main) -->
-  	<copy file="${maven.build.dir}/revolt.jar"
+  	<ant:copy file="${maven.build.dir}/revolt.jar"
   		  todir="${maven.build.dir}/uberjar/WORLDS-INF/lib"/>
   		  
     <!-- Jar it up -->
@@ -157,5 +165,44 @@
         fork="true"
         failonerror="true"/>
   </postGoal>
+
+  <preGoal name="test:test">
+	<attainGoal name="build-test-data"/>
+  </preGoal>
+
+  <goal name="build-test-data">
+	<ant:copy todir="${maven.build.dir}/test-data">
+		<fileset dir="src/test-data" includes="**/*"/>
+	</ant:copy>
+  </goal>
+
+  <goal name="compile-abcd" prereqs="java:compile">
+    <mkdir dir="${maven.build.dir}/abcd-classes"/>
+    <javac 
+     destdir="${maven.build.dir}/abcd-classes"
+     debug="on"
+	 classpath="${maven.build.dest}"
+     srcdir="${basedir}/src/java/abcd/"/>
+  </goal>
+
+  <goal name="build-abcd" prereqs="compile-abcd,build-test-data">
+	<mkdir dir="${maven.build.dir}/test-data"/>
+	<jar jarfile="${maven.build.dir}/test-data/a.jar">
+		<fileset dir="${maven.build.dir}/abcd-classes" includes="a/**"/>
+		<fileset dir="src/test-data" includes="a.properties"/>
+	</jar>
+    
+	<jar jarfile="${maven.build.dir}/test-data/b.jar"
+		 basedir="${maven.build.dir}/abcd-classes"
+		 includes="b/**"/>
+
+	<jar jarfile="${maven.build.dir}/test-data/c.jar"
+		 basedir="${maven.build.dir}/abcd-classes"
+		 includes="c/**"/>
+
+	<jar jarfile="${maven.build.dir}/test-data/d.jar"
+		 basedir="${maven.build.dir}/abcd-classes"
+		 includes="d/**"/>
+  </goal>
 
 </project>
