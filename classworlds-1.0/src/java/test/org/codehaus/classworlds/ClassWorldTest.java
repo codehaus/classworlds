@@ -113,6 +113,7 @@ public class ClassWorldTest extends TestCase
         try
         {
             this.world.getRealm( "foo" );
+            fail( "throw NoSuchRealmException" );
         }
         catch (NoSuchRealmException e)
         {
