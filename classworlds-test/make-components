@@ -1,0 +1,47 @@
+#!/bin/sh
+
+components="0 1 2 3 4"
+
+CLASSWORLDS_DIR=`pwd`/../classworlds/src/test-jars
+
+mkdir -p $CLASSWORLDS_DIR
+
+DIR=target
+
+rm -rf $DIR
+
+for component in $components
+do
+  CDIR=$DIR/component${component}
+
+  mkdir -p $CDIR
+  
+  cp template/* $CDIR
+  
+  (
+    cd $CDIR
+  
+    sed -e "s/\${count}/${component}/" project.xml > tmp; mv tmp project.xml
+    sed -e "s/\${count}/${component}/" components.xml > tmp; mv tmp components.xml    
+    sed -e "s/\${count}/${component}/" Component.java > Component${component}.java; rm Component.java
+    sed -e "s/\${count}/${component}/" DefaultComponent.java > DefaultComponent${component}.java; rm DefaultComponent.java
+    
+    DDIR=src/main/resources/META-INF/plexus
+    
+    mkdir -p $DDIR
+    
+    mv components.xml $DDIR
+    
+    JDIR=src/main/java/org/codehaus/classwords
+    
+    mkdir -p $JDIR
+    
+    mv Component${component}.java $JDIR
+    
+    mv DefaultComponent${component}.java $JDIR
+    
+    mboot
+        
+    cp target/*.jar $CLASSWORLDS_DIR
+  )
+done
