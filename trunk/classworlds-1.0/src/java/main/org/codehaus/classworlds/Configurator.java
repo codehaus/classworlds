@@ -364,28 +364,31 @@ public class Configurator
 
         final String suffix = localName.substring( starLoc + 1 );
 
-        File[] matches = dir.listFiles(
-            new FilenameFilter() {
-                public boolean accept(File dir, String name)
-                {
-                    if ( !name.startsWith( prefix ) )
-                    {
-                        return false;
-                    }
-
-                    if ( !name.endsWith( suffix ) )
-                    {
-                        return false;
-                    }
-
-                    return true;
-                }
-            }
-            );
-
-        for ( int i = 0 ; i < matches.length ; ++i )
+        if ( dir.exists() )
         {
-            realm.addConstituent( matches[i].toURL() );
+            File[] matches = dir.listFiles(
+                new FilenameFilter() {
+                    public boolean accept(File dir, String name)
+                    {
+                        if ( !name.startsWith( prefix ) )
+                        {
+                            return false;
+                        }
+    
+                        if ( !name.endsWith( suffix ) )
+                        {
+                            return false;
+                        }
+    
+                        return true;
+                    }
+                }
+                );
+
+            for ( int i = 0 ; i < matches.length ; ++i )
+            {
+                realm.addConstituent( matches[i].toURL() );
+            }
         }
     }
 
