@@ -468,7 +468,22 @@ public class Launcher
         }
         
         launcher.configure( is );
-
-        launcher.launch(args);
+        
+        try {
+            launcher.launch(args);
+        }
+        catch (InvocationTargetException e) {
+            // Decode ITE (if we can)
+            Throwable t = e.getTargetException();
+            if (t instanceof Exception) {
+                throw (Exception)t;
+            }
+            if (t instanceof Error) {
+                throw (Error)t;
+            }
+            
+            // Else just toss the ITE
+            throw e;
+        }
     }
 }
