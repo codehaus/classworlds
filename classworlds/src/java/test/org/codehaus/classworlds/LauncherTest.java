@@ -93,11 +93,29 @@ public class LauncherTest
         launcher.launch( new String[]{} );
     }
 
+    public void testLaunch_ValidStandardExitCode() throws Exception
+    {
+        launcher.configure( getConfigPath( "valid-launch-exitCode.conf" ) );
+
+        launcher.launch( new String[]{} );
+
+        assertEquals( "check exit code", 15, launcher.getExitCode() );
+    }
+
     public void testLaunch_ValidEnhanced() throws Exception
     {
         launcher.configure( getConfigPath( "valid-enh-launch.conf" ) );
 
         launcher.launch( new String[]{} );
+    }
+
+    public void testLaunch_ValidEnhancedExitCode() throws Exception
+    {
+        launcher.configure( getConfigPath( "valid-enh-launch-exitCode.conf" ) );
+
+        launcher.launch( new String[]{} );
+
+        assertEquals( "check exit code", 45, launcher.getExitCode() );
     }
 
     public void testLaunch_NoSuchMethod() throws Exception
