@@ -164,14 +164,12 @@
     
   </goal>
   
-  <!--
   <postGoal name="test:test">
     <java 
         jar="${maven.build.dir}/uberjar-test.jar" 
         fork="true"
         failonerror="true"/>
   </postGoal>
-  -->
 
   <preGoal name="test:test">
 	<attainGoal name="build-test-data"/>
