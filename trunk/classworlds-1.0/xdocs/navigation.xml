@@ -6,7 +6,7 @@
 
   <body>
     <links>
-      <item name="The Werken Company" href="http://www.werken.com/"/>
+      <item name="The Codehaus" href="http://codehaus.org"/>
     </links>
     <menu name="classworlds">
       <item name="Overview"            href="/index.html"/> 
