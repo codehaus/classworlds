@@ -118,7 +118,7 @@ public interface ClassRealm
     Enumeration findResources( String name ) throws IOException;
 
     Enumeration getResources(String name) throws IOException;
-    
+
     /** Add a constituent to this realm for locating classes.
      *
      *  <p>
@@ -134,6 +134,16 @@ public interface ClassRealm
      */
     void addConstituent(URL constituent);
 
+    /** Adds a byte[] class definition as a constituent for locating classes.
+     *
+     *  @param name class name
+     *  @param b the class definition as a byte[]
+     *  @param off offset
+     *  @param len length
+     */
+    public void addConstituent(String name,
+                            	 byte[] b) throws ClassNotFoundException;
+
     /** Set the parent <code>ClassRealm</code>.
      *
      * @param classRealm The parent ClassRealm.
@@ -146,4 +156,16 @@ public interface ClassRealm
      */
     ClassRealm createChildRealm( String id );
 
+    /**
+     * Reload all the constituents in the realm.
+     *
+     */
+    void reload();
+    
+    /**
+     * Reload all the constituents in the realm.  
+     * 
+     * @param reloadParent Whether or not to reload the parent realm.
+     */
+    void reload(boolean reloadParent);
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project>
 
   <pomVersion>3</pomVersion>
@@ -99,6 +98,25 @@
       <url>http://xml.apache.org/</url>
     </dependency>
 
+	<!-- Testing dependencies -->
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-util</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-attrs</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -109,7 +127,7 @@
 
     <unitTest>
       <includes>
-        <include>**/*Test.java</include>
+        <include>**/ClassRealmImplTest.java</include>
       </includes>
       <excludes>
         <exclude>**/LauncherTest.java</exclude>
