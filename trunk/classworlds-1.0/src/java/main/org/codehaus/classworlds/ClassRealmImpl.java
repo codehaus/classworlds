@@ -265,14 +265,7 @@ class ClassRealmImpl implements ClassRealm
         {
             if ( getParent() != null )
             {
-                try
-                {
-                    clazz = getParent().getClassLoader().loadClass( name );
-                }
-                catch ( ClassNotFoundException cnfe2 )
-                {
-                    throw cnfe2;
-                }
+                clazz = getParent().getClassLoader().loadClass( name );
             }
             else
             {
