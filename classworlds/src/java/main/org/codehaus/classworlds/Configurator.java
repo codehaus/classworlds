@@ -233,13 +233,13 @@ public class Configurator
                     }
                 }
 
-                if ( System.getProperty( property ) != null )
+                String value = System.getProperty( property );
+                
+                if ( value != null )
                 {
-                    return;
+                    continue;
                 }
 
-                String value = null;
-                
                 if ( propertiesFileName != null )
                 {
                     File propertiesFile = new File( propertiesFileName );
@@ -253,11 +253,6 @@ public class Configurator
                             properties.load( new FileInputStream( propertiesFileName ) );
     
                             value = properties.getProperty( property );
-
-                            if ( value != null && value.trim().length() > 0 )
-                            {
-                                value = filter( properties.getProperty( property ) );
-                            }
                         }
                         catch ( Exception e )
                         {
@@ -273,6 +268,7 @@ public class Configurator
 
                 if ( value != null )
                 {
+                    value = filter( value );
                     System.setProperty( property, value );
                 }
             }
