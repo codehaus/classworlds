@@ -48,7 +48,6 @@ package org.codehaus.classworlds;
 
 import junit.framework.TestCase;
 
-import java.io.File;
 import java.net.URL;
 import java.net.MalformedURLException;
 
@@ -456,9 +455,7 @@ public class ClassRealmImplTest extends TestCase
 
     protected URL getJarUrl(String jarName) throws MalformedURLException
     {
-        return new File( new File( System.getProperty( "basedir" ),
-                                   "target/test-data" ),
-                         jarName ).toURL();
+        return TestUtil.getTestResourceUrl(jarName);
     }
     
     
