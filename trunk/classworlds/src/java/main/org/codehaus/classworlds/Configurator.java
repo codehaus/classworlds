@@ -146,6 +146,10 @@ public class Configurator
             world = new ClassWorld();
         }
 
+        ClassLoader foreignClassLoader = null;
+
+        if ( this.launcher != null ) foreignClassLoader = this.launcher.getSystemClassLoader();
+
         ClassRealm curRealm = null;
 
         String line = null;
@@ -283,7 +287,7 @@ public class Configurator
 
                 String realmName = line.substring( 1, rbrack );
 
-                curRealm = world.newRealm( realmName );
+                curRealm = world.newRealm( realmName, foreignClassLoader );
 
                 // Stash the configured realm for subsequent association processing.
                 configuredRealms.put( realmName, curRealm );
