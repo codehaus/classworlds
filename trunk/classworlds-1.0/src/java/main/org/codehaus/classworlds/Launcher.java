@@ -424,19 +424,6 @@ public class Launcher
     public static void main(String[] args)
         throws Exception
     {
-        String protoPkgs = System.getProperty( "java.protocol.handler.pkgs" );
-
-        if ( protoPkgs == null )
-        {
-            System.setProperty( "java.protocol.handler.pkgs",
-                                "org.codehaus.classworlds.protocol" );
-        }
-        else if ( protoPkgs.indexOf( "org.codehaus.classworlds.protocol" ) < 0 )
-        {
-            System.setProperty( "java.protocol.handler.pkgs",
-                                protoPkgs + "|org.codehaus.classworlds.protocol" );
-        }
-
         String classworldsConf = System.getProperty(CLASSWORLDS_CONF);
 
         InputStream is = null;
@@ -460,32 +447,32 @@ public class Launcher
                 is = cl.getResourceAsStream(CLASSWORLDS_CONF);
             }
         }
-        
+
         if (is == null)
         {
             throw new Exception( "classworlds configuration not specified nor found "
                                  + "in the classpath" );
         }
-        
+
         launcher.configure( is );
-        
+
         try
         {
             launcher.launch(args);
         }
-        catch (InvocationTargetException e) 
+        catch (InvocationTargetException e)
         {
             // Decode ITE (if we can)
             Throwable t = e.getTargetException();
-            if (t instanceof Exception) 
+            if (t instanceof Exception)
             {
                 throw (Exception)t;
             }
-            if (t instanceof Error) 
+            if (t instanceof Error)
             {
                 throw (Error)t;
             }
-            
+
             // Else just toss the ITE
             throw e;
         }
