@@ -46,13 +46,20 @@ package org.codehaus.classworlds;
 
  */
 
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.TreeSet;
-import java.util.Set;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
+
 
 /** Implementation of <code>ClassRealm</code>.
  *
@@ -87,7 +94,19 @@ class DefaultClassRealm implements ClassRealm
 
     /** Parent ClassRealm */
     private ClassLoader parentClassLoader;
-    
+
+    /** Secondary ClassLoaders */
+    List classLoaders;       //left as package variable for unit testing
+    Map  urlCache;       //left as package variable for unit testing
+
+    /** totals used for garbage collection
+      * left as package variables for unit testing
+      */
+    int totalUniqueURLs;
+    int totalURLs;
+    int totalClassLoaders;
+    int maxClassLoaders;
+
     // ------------------------------------------------------------
     //     Constructors
     // ------------------------------------------------------------
@@ -105,8 +124,10 @@ class DefaultClassRealm implements ClassRealm
         this.world = world;
         this.id = id;
         this.parentClassLoader = parentClassLoader;
-        
+
         this.imports = new TreeSet();
+        this.classLoaders = new ArrayList();
+        this.urlCache = new HashMap();
 
         // We need to detect whether we are running in an UberJar
         // or not.
@@ -118,6 +139,11 @@ class DefaultClassRealm implements ClassRealm
         {
             this.classLoader = new RealmClassLoader( this, parentClassLoader );
         }
+        
+        this.totalUniqueURLs = 0;
+        this.totalURLs = 0;
+        this.totalClassLoaders = 1;
+        this.maxClassLoaders = 1;
     }
 
     // ------------------------------------------------------------
@@ -131,6 +157,15 @@ class DefaultClassRealm implements ClassRealm
     public ClassRealm getParent()
     {
         return parent;
+    }
+
+    /**
+     *
+     *
+     */
+    public void setMaxClassLoaders(int maxClassLoaders)
+    {
+      this.maxClassLoaders = maxClassLoaders;
     }
 
     /**
@@ -183,13 +218,101 @@ class DefaultClassRealm implements ClassRealm
                                      pkgName ) );
     }
 
-    /** Add a constituent to this realm for locating classes.
-     *
+    /**
+     *  Add a constituent to this realm for locating classes.
+     *  Currently has a very simple garbage collection algorithm,
+     *  that is just a maxClassLoaders, but it could be a compination
+     *  of totaClassLoaders, totalURLs and totalUniqueURLs as well.
+     *  @todo : decent garbage collection algorithm
      *  @param constituent URL to contituent jar or directory.
      */
     public void addConstituent( URL constituent )
     {
-        this.classLoader.addConstituent( constituent );
+        // check if constituent is in the current primary classLoader
+        if (containsURL(this.classLoader, constituent))
+        {
+            // do we perform garbage collection
+            if (this.totalClassLoaders < this.maxClassLoaders)
+            {
+                // no gc, so add primary to list, create new primary and add
+                // constituent
+                classLoaders.add(this.classLoader);
+                this.classLoader = new RealmClassLoader(this);
+                this.classLoader.addConstituent(constituent);
+                this.urlCache.put(constituent.toExternalForm(), constituent);
+                this.totalClassLoaders++;
+                this.totalURLs++;
+            }
+            else
+            {
+                //add latest version of class and then reload(); - do garbage
+                // collection
+                this.urlCache.put(constituent.toExternalForm(), constituent);
+                reload();
+            }
+        }
+        else
+        {
+            //add constituent to the primary classLoader
+            this.classLoader.addConstituent(constituent);
+            this.urlCache.put(constituent.toExternalForm(), constituent);
+            this.totalURLs++;
+        }
+        
+        this.totalUniqueURLs = urlCache.size();
+    }
+
+    /**
+     *  Adds a byte[] class definition as a constituent for locating classes.
+     *  Currently uses BytesURLStreamHandler to hold a reference of the byte[] in memory.
+     *  This ensures we have a unifed URL resource model for all constituents.
+     *  The code to cache to disk is commented out - maybe a property to choose which method?
+     *
+     *  @param name class name
+     *  @param b the class definition as a byte[]
+     */
+    public void addConstituent(String constituent,
+                               byte[] b) throws ClassNotFoundException
+    {
+        try
+        {
+            File path, file;
+            if (constituent.lastIndexOf('.') != -1)
+            {
+                path = new File("byteclass/" + constituent.substring(0, constituent.lastIndexOf('.') + 1).replace('.', File.separatorChar));
+                /*
+                if (!path.exists())
+                {
+                    path.mkdirs();
+                }
+                if ((path.getParentFile() != null)&&(!path.getParentFile().exists()))
+                {
+                    path.getParentFile().mkdirs();
+                }
+                file = File.createTempFile(constituent.substring(constituent.lastIndexOf('.') + 1), ".class", path);
+                */
+                file = new File(path, constituent.substring(constituent.lastIndexOf('.') + 1) + ".class");
+            }
+            else
+            {
+                path = new File("byteclass/");
+                //file = File.createTempFile(constituent, ".class", path);
+                file = new File(path, constituent + ".class");
+            }
+            /*
+            FileOutputStream os = new FileOutputStream(path.getPath());
+            os.write(b);
+            os.close();
+            url = path.toURL();
+            */
+            addConstituent( new URL( null, 
+                                     file.toURL().toExternalForm(), 
+                                     new BytesURLStreamHandler(b) ) );
+        }
+        catch (java.io.IOException e)
+        {
+            throw new ClassNotFoundException( "Couldn't load byte stream.", e );
+        }
     }
 
     /** Locate the <code>ClassRealm</code> that should
@@ -242,7 +365,7 @@ class DefaultClassRealm implements ClassRealm
         }
 
         DefaultClassRealm sourceRealm = locateSourceRealm( name );
-        
+
         if ( sourceRealm == this )
         {
             return loadClassDirect( name );
@@ -264,6 +387,11 @@ class DefaultClassRealm implements ClassRealm
     /** Load a class.  First try this realm's class loader, then
      *  the parent's if there is one.
      *
+     * when trying this realm,perform the following sequences:
+     *  1. Try this realm's primary ClassLoader.
+     *  2. Try secondary classLoaders in order of precedent.
+     *  3. If the realm has a parent try the parent's ClassLoader.
+     *
      *  @param name The name of the class to load.
      *
      *  @return The loaded class.
@@ -280,13 +408,31 @@ class DefaultClassRealm implements ClassRealm
         }
         catch ( ClassNotFoundException cnfe1 )
         {
-            if ( getParent() != null )
+            if (this.classLoaders.size() > 0)
             {
-                clazz = getParent().getClassLoader().loadClass( name );
+                for (int i = this.classLoaders.size() - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        clazz = ((RealmClassLoader)this.classLoaders.get(i)).loadClassDirect( name );
+                        break;
+                    }
+                    catch ( ClassNotFoundException cnfe2 )
+                    {
+                    }
+                }
             }
-            else
+
+            if (clazz == null)
             {
-                throw cnfe1;
+                if (getParent() != null)
+                {
+                    clazz = getParent().getClassLoader().loadClass( name );
+                }
+                else
+                {
+                    throw cnfe1;
+                }
             }
         }
 
@@ -356,34 +502,94 @@ class DefaultClassRealm implements ClassRealm
         throws IOException
     {
         name = UrlUtils.normalizeUrlPath( name );
- 
+
         Vector resources = new Vector();
-        
+
         // Attempt to load directly first, then go to the imported packages.
         Enumeration direct = classLoader.findResourcesFromClassLoader( name );
-      
+
         while ( direct.hasMoreElements() )
         {
             resources.addElement( direct.nextElement() );
         }
-        
+
         // Find resources from the parent realm.
         if ( parent != null )
         {
             Enumeration parent = getParent().getResources( name );
-            
+
             while ( parent.hasMoreElements() )
                 resources.addElement( parent.nextElement() );
         }
-        
+
         // TODO: get resources from imports too!
-        
+
         return resources.elements();
     }
-    
+
     public Enumeration getResources(String name)
         throws IOException
     {
         return classLoader.getResources( name );
+    }
+
+    private static boolean containsURL(RealmClassLoader classLoader, URL url)
+    {
+        boolean contains = false;
+        String urlStr;
+        String srcUrlStr = url.toExternalForm();
+        URL[] urls = classLoader.getURLs();
+        
+        for (int i=0; i < urls.length; i++)
+        {
+            urlStr = urls[i].toExternalForm();
+            if (srcUrlStr.equals(urlStr ))
+            {
+                contains = true;
+                break;
+            }
+        }
+        return contains;
+    }
+
+    /**
+     * Quick access reload method, doesn't perform a reload on parent
+     */
+    public void reload()
+    {
+        reload( false );
+    }
+
+    /**
+     * This drops the primary classLoader, and the clears the secondary List
+     * It then uses the HashMap to populate a single class load with
+     * all the constituents. It also resets the stats values.
+     *
+     *@todo: if this fails, the current realm could be broken, need to rollback/throw exception, although it shouldn't fail
+     */
+    public void reload(boolean reloadParent)
+    {
+        this.classLoader = new RealmClassLoader( this );
+
+        URL url;
+        String urlStr;
+        Set keys = this.urlCache.keySet();
+        Iterator it = keys.iterator();
+        
+        while (it.hasNext())
+        {
+            urlStr = (String) it.next();
+            this.classLoader.addConstituent((URL) this.urlCache.get(urlStr));
+        }
+        
+        this.classLoaders.clear();
+        this.totalUniqueURLs = this.urlCache.size();
+        this.totalURLs = this.totalUniqueURLs;
+        this.totalClassLoaders = 1;
+
+        if (reloadParent && (getParent() != null))
+        {
+            getParent().reload(reloadParent);
+        }
     }
 }

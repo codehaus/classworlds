@@ -4,7 +4,7 @@ package org.codehaus.classworlds;
  $Id$
 
  Copyright 2002 (C) The Werken Company. All Rights Reserved.
- 
+
  Redistribution and use of this software and associated documentation
  ("Software"), with or without modification, are permitted provided
  that the following conditions are met:
@@ -12,25 +12,25 @@ package org.codehaus.classworlds;
  1. Redistributions of source code must retain copyright
     statements and notices.  Redistributions must also contain a
     copy of this document.
- 
+
  2. Redistributions in binary form must reproduce the
     above copyright notice, this list of conditions and the
     following disclaimer in the documentation and/or other
     materials provided with the distribution.
- 
+
  3. The name "classworlds" must not be used to endorse or promote
     products derived from this Software without prior written
     permission of The Werken Company.  For written permission,
     please contact bob@werken.com.
- 
+
  4. Products derived from this Software may not be called "classworlds"
     nor may "classworlds" appear in their names without prior written
     permission of The Werken Company. "classworlds" is a registered
     trademark of The Werken Company.
- 
+
  5. Due credit should be given to The Werken Company.
     (http://classworlds.werken.com/).
- 
+
  THIS SOFTWARE IS PROVIDED BY THE WERKEN COMPANY AND CONTRIBUTORS
  ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -43,15 +43,22 @@ package org.codehaus.classworlds;
  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  OF THE POSSIBILITY OF SUCH DAMAGE.
- 
+
  */
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import junit.framework.TestCase;
 
-import java.net.URL;
-import java.net.MalformedURLException;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.CodeVisitor;
+import org.objectweb.asm.Constants;
 
-public class ClassRealmImplTest extends TestCase
+
+public class ClassRealmImplTest extends TestCase  implements Constants
 {
     private ClassWorld world;
 
@@ -86,7 +93,7 @@ public class ClassRealmImplTest extends TestCase
     public void testLocateSourceRealm_NoImports() throws Exception
     {
         DefaultClassRealm realm = new DefaultClassRealm( this.world,
-                                                         "foo", 
+                                                         "foo",
                                                          null );
 
         assertSame( realm,
@@ -121,11 +128,11 @@ public class ClassRealmImplTest extends TestCase
     public void testLocateSourceRealm_MultipleImport() throws Exception
     {
         DefaultClassRealm mainRealm = (DefaultClassRealm) this.world.newRealm( "main" );
-        
+
         ClassRealm werkflowRealm = this.world.newRealm( "werkflow" );
 
         ClassRealm blissedRealm = this.world.newRealm( "blissed" );
-        
+
         mainRealm.importFrom( "werkflow",
                               "com.werken.werkflow" );
 
@@ -154,7 +161,7 @@ public class ClassRealmImplTest extends TestCase
     public void testLocateSourceRealm_Hierachy() throws Exception
     {
         DefaultClassRealm mainRealm = (DefaultClassRealm) this.world.newRealm( "main" );
-        
+
         ClassRealm fooRealm = this.world.newRealm( "foo" );
         ClassRealm fooBarRealm = this.world.newRealm( "fooBar" );
         ClassRealm fooBarBazRealm = this.world.newRealm( "fooBarBaz" );
@@ -200,7 +207,7 @@ public class ClassRealmImplTest extends TestCase
         ClassRealm fooRealm = this.world.newRealm( "foo" );
 
         DefaultClassRealm mainRealm = (DefaultClassRealm) this.world.newRealm( "main" );
-        
+
         mainRealm.importFrom( "fooBarBaz",
                               "foo.bar.baz" );
 
@@ -316,7 +323,7 @@ public class ClassRealmImplTest extends TestCase
         {
             // expected and correct
         }
-                
+
         realmA.addConstituent( getJarUrl( "a.jar" ) );
 
         try
@@ -349,21 +356,21 @@ public class ClassRealmImplTest extends TestCase
         assertSame( classA,
                     classMain );
     }
-    
+
     public void testLoadClass_Package() throws Exception
     {
         ClassRealm realmA = this.world.newRealm( "realmA" );
         realmA.addConstituent( getJarUrl( "a.jar" ) );
-        
+
         Class clazz = realmA.loadClass( "a.A" );
         assertNotNull(clazz);
         assertEquals("a.A", clazz.getName());
-        
+
         Package p = clazz.getPackage();
         assertNotNull(p);
-        assertEquals("p.getName()", "a", p.getName());        
+        assertEquals("p.getName()", "a", p.getName());
     }
-        
+
 
     public void testLoadClass_Complex() throws Exception
     {
@@ -472,19 +479,299 @@ public class ClassRealmImplTest extends TestCase
     {
         return TestUtil.getTestResourceUrl(jarName);
     }
-    
-    
+
+
     public void testLoadClass_ClassWorldsClassRepeatedly() throws Exception
-       {
-           ClassRealm mainRealm = this.world.newRealm( "main" );
+    {
+        ClassRealm mainRealm = this.world.newRealm( "main" );
 
-            for (int i = 0; i < 100; i++) {
-               Class cls = mainRealm.loadClass( "org.codehaus.classworlds.ClassWorld" );
+         for (int i = 0; i < 100; i++)
+         {
+            Class cls = mainRealm.loadClass( "org.codehaus.classworlds.ClassWorld" );
 
-               assertNotNull( cls );
+            assertNotNull( cls );
 
-               assertSame( ClassWorld.class,
-                       cls );
-            }
-       }
+            assertSame( ClassWorld.class,
+                    cls );
+         }
+    }
+
+	/**
+     * This defines classes as byte[] and tries to load them as constituents
+     * It checks that definitions can be readadded and that we see the
+     * current definition
+     *  
+     */
+    public void testReloadByteConstituent() throws Exception
+    {
+        byte[] b;
+        Class clazz;
+        Object person;
+
+        DefaultClassRealm realm = (DefaultClassRealm) this.world
+                .newRealm("byteAsm");
+
+        b = createClass("Person", "name", "Bob");
+        realm.addConstituent("Person", b);
+
+        clazz = realm.loadClass("Person");
+        person = clazz.newInstance();
+        java.lang.reflect.Method method = clazz.getMethod("getName", null);
+        assertEquals((String) method.invoke(person, null), "Bob");
+
+        b = createClass("Person", "name", "Mark");
+        realm.addConstituent("Person", b);
+
+        clazz = realm.loadClass("Person");
+        person = clazz.newInstance();
+        method = clazz.getMethod("getName", null);
+        assertEquals((String) method.invoke(person, null), "Mark");
+    }
+
+    /**
+     * This defines classes as byte[] which it then writes to a file. The file
+     * is dir for the file is then added as a constituent. It checks that
+     * definitions can be readadded and that we see the current definition
+     *  
+     */
+
+    public void testReloadFileConstituent() throws Exception
+    {
+        byte[] b;
+        Class clazz;
+        Object person;
+        FileOutputStream os;
+
+        DefaultClassRealm realm = (DefaultClassRealm) this.world
+                .newRealm("classAsm");
+        File baseDir = new File(System.getProperty("basedir"));
+        File dynDir = new File(baseDir, "target/test-data");
+        realm.addConstituent(dynDir.toURL());
+
+        b = createClass("Person", "name", "Bob");
+        os = new FileOutputStream("target/test-data/Person.class");
+        os.write(b);
+        os.close();
+
+        clazz = realm.loadClass("Person");
+        person = clazz.newInstance();
+        java.lang.reflect.Method method = clazz.getMethod("getName", null);
+        assertEquals((String) method.invoke(person, null), "Bob");
+
+        b = createClass("Person", "name", "Mark");
+        os = new FileOutputStream("target/test-data/Person.class");
+        os.write(b);
+        os.close();
+
+        realm.addConstituent(dynDir.toURL());
+
+        clazz = realm.loadClass("Person");
+        person = clazz.newInstance();
+        method = clazz.getMethod("getName", null);
+        assertEquals((String) method.invoke(person, null), "Mark");
+    }
+
+
+   /**
+    * This checks the Garbage Collection is uses the stats variables
+    * totalURLs, totalUniqueURLs and totalClassLoaders to assert that
+    * its working correctly.
+    * This test sets the simplested gc algorithm of maxClassLoaders=2
+    *
+    */
+ 	public void testReloadGarbageCollection1() throws Exception
+    {
+        byte[] b;
+        Class clazz;
+        Object object;
+        DefaultClassRealm realm;
+        java.lang.reflect.Method method;
+
+        realm = (DefaultClassRealm) this.world.newRealm("gc1");
+        realm.setMaxClassLoaders(2);
+
+        b = createClass("Person", "name", "Mark");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "London");
+        realm.addConstituent("Address", b);
+
+        b = createClass("Job", "Company", "Widget Co");
+        realm.addConstituent("Job", b);
+
+        assertEquals(realm.totalClassLoaders, 1);
+        assertEquals(realm.totalURLs, 3);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        b = createClass("Person", "name", "Bob");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "US");
+        realm.addConstituent("Address", b);
+
+        b = createClass("Job", "Company", "Werken");
+        realm.addConstituent("Job", b);
+
+        assertEquals(realm.totalClassLoaders, 2);
+        assertEquals(realm.totalURLs, 6);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        b = createClass("Person", "name", "Jason");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "OZ");
+        realm.addConstituent("Address", b);
+
+        b = createClass("Job", "Company", "XXX");
+        realm.addConstituent("Job", b);
+
+        assertEquals(realm.totalClassLoaders, 2);
+        assertEquals(realm.totalURLs, 5);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        b = createClass("Person", "name", "Dan");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "US");
+        realm.addConstituent("Address", b);
+
+        assertEquals(realm.totalClassLoaders, 1);
+        assertEquals(realm.totalURLs, 3);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        clazz = realm.loadClass("Person");
+        object = clazz.newInstance();
+        method = clazz.getMethod("getName", null);
+        assertEquals((String) method.invoke(object, null), "Dan");
+
+        clazz = realm.loadClass("Address");
+        object = clazz.newInstance();
+        method = clazz.getMethod("getLocation", null);
+        assertEquals((String) method.invoke(object, null), "US");
+
+        clazz = realm.loadClass("Job");
+        object = clazz.newInstance();
+        method = clazz.getMethod("getCompany", null);
+        assertEquals((String) method.invoke(object, null), "XXX");
+    }
+
+   /**
+    * This checks the Garbage Collection is uses the stats variables
+    * totalURLs, totalUniqueURLs and totalClassLoaders to assert that
+    * its working correctly.
+    * This test sets the simplested gc algorithm of maxClassLoaders=3
+    *
+    */
+
+		public void testReloadGarbageCollection2() throws Exception
+    {
+        byte[] b;
+        Class clazz;
+        Object object;
+        DefaultClassRealm realm;
+        java.lang.reflect.Method method;
+
+        realm = (DefaultClassRealm) this.world.newRealm("gc2");
+        realm.setMaxClassLoaders(3);
+
+        b = createClass("Person", "name", "Mark");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "London");
+        realm.addConstituent("Address", b);
+
+        b = createClass("Job", "Company", "Widget Co");
+        realm.addConstituent("Job", b);
+
+        assertEquals(realm.totalClassLoaders, 1);
+        assertEquals(realm.totalURLs, 3);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        b = createClass("Person", "name", "Bob");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "US");
+        realm.addConstituent("Address", b);
+
+        b = createClass("Job", "Company", "Werken");
+        realm.addConstituent("Job", b);
+
+        assertEquals(realm.totalClassLoaders, 2);
+        assertEquals(realm.totalURLs, 6);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        b = createClass("Person", "name", "Jason");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "OZ");
+        realm.addConstituent("Address", b);
+
+        b = createClass("Job", "Company", "XXX");
+        realm.addConstituent("Job", b);
+
+        assertEquals(realm.totalClassLoaders, 3);
+        assertEquals(realm.totalURLs, 9);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        b = createClass("Person", "name", "Dan");
+        realm.addConstituent("Person", b);
+
+        b = createClass("Address", "Location", "US");
+        realm.addConstituent("Address", b);
+
+        assertEquals(realm.totalClassLoaders, 2);
+        assertEquals(realm.totalURLs, 4);
+        assertEquals(realm.totalUniqueURLs, 3);
+
+        clazz = realm.loadClass("Person");
+        object = clazz.newInstance();
+        method = clazz.getMethod("getName", null);
+        assertEquals((String) method.invoke(object, null), "Dan");
+
+        clazz = realm.loadClass("Address");
+        object = clazz.newInstance();
+        method = clazz.getMethod("getLocation", null);
+        assertEquals((String) method.invoke(object, null), "US");
+
+        clazz = realm.loadClass("Job");
+        object = clazz.newInstance();
+        method = clazz.getMethod("getCompany", null);
+        assertEquals((String) method.invoke(object, null), "XXX");
+    }
+
+    /**
+     * Help method to create simple class definitions for unit testing
+     *  
+     */
+    private byte[] createClass(String className, String fieldName, String name)
+    {
+        byte[] b;
+        ClassWriter cw = new ClassWriter(true);
+        CodeVisitor cv;
+
+        cw.visit(ACC_PUBLIC, className, "java/lang/Object", null, null);
+
+        cw.visitField(ACC_PRIVATE, fieldName, "Ljava/lang/String;", null, null);
+
+        cv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+        cv.visitVarInsn(ALOAD, 0);
+        cv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+        cv.visitVarInsn(ALOAD, 0);
+        cv.visitLdcInsn(name);
+        cv.visitFieldInsn(PUTFIELD, className, fieldName, "Ljava/lang/String;");
+        cv.visitInsn(RETURN);
+        cv.visitMaxs(0, 0);
+
+        cv = cw.visitMethod(ACC_PUBLIC, "get"
+                + fieldName.substring(0, 1).toUpperCase()
+                + fieldName.substring(1), "()Ljava/lang/String;", null, null);
+        cv.visitVarInsn(ALOAD, 0);
+        cv.visitFieldInsn(GETFIELD, className, fieldName, "Ljava/lang/String;");
+        cv.visitInsn(ARETURN);
+        cv.visitMaxs(0, 0);
+        cw.visitEnd();
+
+        return cw.toByteArray();
+    }
+
 }

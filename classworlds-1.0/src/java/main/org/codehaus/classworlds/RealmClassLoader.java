@@ -46,10 +46,12 @@ package org.codehaus.classworlds;
 
  */
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.MalformedURLException;
 import java.util.Enumeration;
 
 /** Classloader for <code>ClassRealm</code>s.
@@ -84,7 +86,7 @@ class RealmClassLoader
     /** Construct.
      *
      *  @param realm The realm for which this loads.
-     * 
+     *
      *  @param classLoader The parent ClassLoader.
      */
     RealmClassLoader(DefaultClassRealm realm, ClassLoader classLoader)
@@ -92,7 +94,7 @@ class RealmClassLoader
         super( new URL[0], classLoader );
         this.realm = realm;
     }
-    
+
     // ------------------------------------------------------------
     //     Instance methods
     // ------------------------------------------------------------
@@ -107,31 +109,76 @@ class RealmClassLoader
     }
 
     /** Add a constituent to this realm for locating classes.
+     *  If the url definition ends in .class its a BytesURLStreamHandler
+     *  so use defineClass insead. addURL is still called for byte[]
+     *  even though it has no affect and we use defineClass instead,
+     *  this is for consistentency and to allow access to the class
+     *  with getURLs()
      *
      *  @param constituent URL to contituent jar or directory.
      */
     void addConstituent(URL constituent)
     {
         String urlStr = constituent.toExternalForm();
-
-        if ( urlStr.startsWith( "jar:" )
-             &&
-             urlStr.endsWith( "!/" ) )
+        if (!urlStr.endsWith(".class"))
         {
-            urlStr = urlStr.substring( 4,
-                                       urlStr.length() - 2 );
+            if ( urlStr.startsWith( "jar:" )
+                 &&
+                 urlStr.endsWith( "!/" ) )
+            {
+                urlStr = urlStr.substring( 4,
+                                           urlStr.length() - 2 );
 
+                try
+                {
+                    constituent = new URL( urlStr );
+                }
+                catch (MalformedURLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            addURL( constituent );
+        }
+        else
+        {
             try
             {
-                constituent = new URL( urlStr );
+                byte[] b = getBytesToEndOfStream( new DataInputStream( constituent.openStream() ) );
+                int start = urlStr.lastIndexOf("byteclass") + 10;
+                int end = urlStr.lastIndexOf(".class");
+                
+                String className = urlStr.substring(start, end);
+                
+                super.defineClass(className, b, 0, b.length);
+                
+                addURL(constituent);
             }
-            catch (MalformedURLException e)
+            catch (IOException e)
             {
                 e.printStackTrace();
             }
         }
+    }
 
-        addURL( constituent );
+
+    /**
+     *  Helper method for addConstituent that reads in a DataInputStream and returns it as a byte[]
+     *  It attempts to use in.available - the size of the file - else defaults to 2048
+     */
+    public byte[] getBytesToEndOfStream(DataInputStream in) throws IOException
+    {
+        final int chunkSize = (in.available() > 0) ? in.available() : 2048;
+        byte[] buf = new byte[chunkSize];
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream(chunkSize);
+        int count;
+        
+        while ((count=in.read(buf)) != -1)
+        {
+            byteStream.write(buf, 0, count);
+        }
+        return byteStream.toByteArray();
     }
 
     /** Load a class directly from this classloader without
@@ -177,7 +224,7 @@ class RealmClassLoader
     }
 
     /** Find a resource within this ClassLoader only (don't delegate to the parent).
-     * 
+     *
      *  @return The resource.
      */
     public URL findResource( String name )
@@ -194,10 +241,10 @@ class RealmClassLoader
     {
         return getRealm().findResources( name );
     }
-    
+
     /** Get a resource from this ClassLoader, and don't search the realm.
      *  Otherwise we'd recurse indefinitely.
-     * 
+     *
      *  @return The resource.
      */
     public URL getResourceFromClassLoader(String name)
@@ -207,7 +254,7 @@ class RealmClassLoader
 
     /** Find resources from this ClassLoader, and don't search the realm.
      *  Otherwise we'd recurse indefinitely.
-     * 
+     *
      *  @return The resource.
      */
     public Enumeration findResourcesFromClassLoader(String name)
