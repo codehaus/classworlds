@@ -79,6 +79,7 @@ public class ConfiguratorTest extends TestCase
         System.getProperties().remove( "set.using.nonexistent" );
         System.getProperties().remove( "set.using.nonexistent.default" );
 	System.getProperties().remove( "set.using.missing" );
+	System.getProperties().remove( "set.using.filtered.default" );
     }
 
     public void testConfigure_Nonexistent() throws Exception
@@ -435,6 +436,15 @@ public class ConfiguratorTest extends TestCase
         this.configurator.configure( getConfigPath( "set-using-missing.conf" ) );
 
         assertEquals( "testSet_Using_Missing_Override", System.getProperty( "set.using.missing" ) );
+    }
+
+    public void testSet_Using_Filtered_Default() throws Exception
+    {
+        assertNull( System.getProperty( "set.using.filtered.default" ) );
+        
+        this.configurator.configure( getConfigPath( "set-using-missing.conf" ) );
+
+        assertEquals( System.getProperty( "user.home" ) + "/m2", System.getProperty( "set.using.filtered.default" ) );
     }
 
     private FileInputStream getConfigPath(String name)
