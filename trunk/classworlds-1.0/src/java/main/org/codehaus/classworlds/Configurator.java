@@ -71,7 +71,7 @@ import java.util.ArrayList;
  *
  *  @version $Id$
  */
-class Configurator
+public class Configurator
 {
     // ------------------------------------------------------------
     //     Constants
@@ -85,13 +85,14 @@ class Configurator
 
     /** Load spec prefix. */
     public static final String LOAD_PREFIX = "load";
-    
+
     // ------------------------------------------------------------
     //     Instance members
     // ------------------------------------------------------------
 
     /** The launcher to configure. */
     private Launcher launcher;
+    private ClassWorld world;
 
     /** Processed Realms. */
     private Map configuredRealms;
@@ -104,16 +105,37 @@ class Configurator
      *
      *  @param launcher The launcher to configure.
      */
-    Configurator(Launcher launcher)
+    public Configurator(Launcher launcher)
     {
         this.launcher = launcher;
 
         configuredRealms = new HashMap();
     }
 
+    /** Construct.
+     *
+     *  @param classWorld The classWorld to configure.
+     */
+    public Configurator(ClassWorld world)
+    {
+        setClassWorld(world);
+    }
+
     // ------------------------------------------------------------
     //     Instance methods
     // ------------------------------------------------------------
+
+    /** set world.
+     *  this setter is provided so you can use the same configurator to configure several "worlds"
+     *
+     *  @param classWorld The classWorld to configure.
+     */
+    public void setClassWorld(ClassWorld world)
+    {
+        this.world = world;
+        configuredRealms = new HashMap();
+    }
+
 
     /** Configure from a file.
      *
@@ -126,12 +148,13 @@ class Configurator
      *  @throws NoSuchRealmException If the config file defines a main entry point in
      *          a non-existent realm.
      */
-    void configure(InputStream is)
+    public void configure(InputStream is)
         throws IOException, MalformedURLException, ConfigurationException, DuplicateRealmException, NoSuchRealmException
     {
         BufferedReader reader = new BufferedReader( new InputStreamReader( is ) );
 
-        ClassWorld world    = new ClassWorld();
+        if (this.world == null) world    = new ClassWorld();
+
         ClassRealm curRealm = null;
 
         String line = null;
@@ -170,13 +193,13 @@ class Configurator
                 {
                     throw new ConfigurationException( "Missing from clause", lineNo, line );
                 }
-                
+
                 String mainClassName = conf.substring( 0,
                                                        fromLoc ).trim();
 
                 String mainRealmName = conf.substring( fromLoc + 4 ).trim();
 
-                this.launcher.setAppMain( mainClassName,
+                if (this.launcher != null) this.launcher.setAppMain( mainClassName,
                                           mainRealmName );
 
                 mainSet = true;
@@ -262,7 +285,7 @@ class Configurator
         // Associate child realms to their parents.
         associateRealms();
 
-        this.launcher.setWorld( world );
+        if (this.launcher != null) this.launcher.setWorld( world );
 
         reader.close();
     }
