@@ -71,7 +71,7 @@
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Created-By" value="Classworlds"/>
         <attribute name="Package" value="${pom.package}"/>
-        <attribute name="Main-Class" value="org.codehaus.classworlds.boot.Bootstrapper"/>
+        <attribute name="Main-Class" value="org.codehaus.classworlds.uberjar.boot.Bootstrapper"/>
       </manifest>
     </jar>
     
@@ -131,10 +131,10 @@
   	<!-- Copy the bootstrap classes -->
   	<copy todir="${maven.build.dir}/uberjar">
   		<fileset dir="${maven.build.dir}/classes">
-  			<include name="org/codehaus/classworlds/boot/Bootstrapper.class"/>
-  			<include name="org/codehaus/classworlds/boot/InitialClassLoader.class"/>
-  			<include name="org/codehaus/classworlds/protocol/jar/Handler.class"/>
-  			<include name="org/codehaus/classworlds/protocol/jar/JarUrlConnection.class"/>
+  			<include name="org/codehaus/classworlds/uberjar/boot/Bootstrapper.class"/>
+  			<include name="org/codehaus/classworlds/uberjar/boot/InitialClassLoader.class"/>
+  			<include name="org/codehaus/classworlds/uberjar/protocol/jar/Handler.class"/>
+  			<include name="org/codehaus/classworlds/uberjar/protocol/jar/JarUrlConnection.class"/>
   			<include name="org/codehaus/classworlds/UrlUtils.class"/>               
   		</fileset>
   	</copy>
@@ -155,7 +155,7 @@
       jarfile="${maven.build.dir}/uberjar-test.jar"
       basedir="${maven.build.dir}/uberjar">
       <manifest>
-        <attribute name="Main-Class" value="org.codehaus.classworlds.boot.Bootstrapper"/>
+        <attribute name="Main-Class" value="org.codehaus.classworlds.uberjar.boot.Bootstrapper"/>
       </manifest>
     </jar>
     
