@@ -1,0 +1,219 @@
+
+<project default="jar:jar"
+         xmlns:ant="jelly:ant"
+         xmlns:j="jelly:core">
+
+  <postGoal name="clover">
+    <copy tofile="${basedir}/target/docs/clover/style.css"
+          file="${basedir}/xdocs/stylesheets/clover-style.css"
+          overwrite="true"/>
+    <copy tofile="${basedir}/target/docs/clover/pkgs-summary"
+          file="${basedir}/target/docs/clover/pkgs-summary.html"/>
+  </postGoal>
+
+  <preGoal name="site:generate">
+    <attainGoal name="clover"/>
+  </preGoal>
+
+  <goal name="classworlds:build-boot-jar" prereqs="java:compile">
+    <property name="boot.classes" value="target/boot-classes"/>
+    <mkdir dir="${boot.classes}"/>
+    <copy todir="${boot.classes}">
+      <fileset dir="${maven.build.dir}/classes">
+        <include name="org/codehaus/classworlds/boot/*.class"/>
+        <include name="org/codehaus/classworlds/protocol/**/*.class"/>
+        <include name="org/codehaus/classworlds/UrlUtils.class"/>
+      </fileset> 
+    </copy>
+
+    <jar
+      jarfile="${maven.build.dir}/classworlds-boot-${pom.currentVersion}.jar"
+      basedir="${boot.classes}">
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Created-By" value="maven"/>
+        <attribute name="Package" value="${pom.package}"/>
+      </manifest>
+    </jar>
+    
+  </goal>
+  
+  <goal name="classworlds:assemble" prereqs="classworlds:build-boot-jar,jar:jar,build-abcd,build-nested,build-test-data">
+
+    <property name="assembly"   value="target/boot-assembly"/>
+    <property name="worlds.inf" value="${assembly}/WORLDS-INF"/>
+    <property name="libdir"     value="${worlds.inf}/lib"/>
+    <property name="confdir"     value="${worlds.inf}/conf"/>
+
+    <copy file="target/classworlds-${pom.currentVersion}.jar" 
+          tofile="${worlds.inf}/classworlds.jar"/>
+
+    <copy todir="${libdir}">
+      <fileset dir="${maven.build.dir}/test-data/">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+
+    <copy file="classworlds.conf" 
+          todir="${confdir}"/>
+
+    <unjar src="${maven.build.dir}/classworlds-boot-${pom.currentVersion}.jar"
+           dest="${assembly}">
+      <patternset>
+        <include name="**/*.class"/>
+      </patternset>
+    </unjar>
+
+    <jar
+      jarfile="${maven.build.dir}/standalone.jar"
+      basedir="${assembly}">
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Created-By" value="Classworlds"/>
+        <attribute name="Package" value="${pom.package}"/>
+        <attribute name="Main-Class" value="org.codehaus.classworlds.uberjar.boot.Bootstrapper"/>
+      </manifest>
+    </jar>
+    
+  </goal>
+
+  <goal name="compile.revolt">
+    <mkdir dir="${basedir}/target/revolt-classes"/>
+    <javac 
+     destdir="${basedir}/target/revolt-classes"
+     debug="on"
+     srcdir="${basedir}/src/java/revolt/"/>
+  </goal>
+
+  <goal name="jar.revolt"
+        prereqs="compile.revolt">
+    <copy todir="${maven.build.dir}/revolt-classes">
+      <fileset dir="${maven.src.dir}/java/revolt">
+        <include name="**/*.properties"/>
+      </fileset> 
+    </copy>
+    <jar
+      jarfile="${maven.build.dir}/revolt.jar"
+      basedir="${maven.build.dir}/revolt-classes"/>
+  </goal>
+
+  <goal name="revolt"
+        prereqs="jar:jar,jar.revolt">
+    <java classname="org.codehaus.classworlds.Launcher" fork="true">
+      <classpath>
+        <pathelement location="${maven.build.dir}/${maven.final.name}.jar"/>
+      </classpath>
+      <sysproperty key="classworlds.conf" value="${maven.src.dir}/java/revolt/main1.conf"/>
+    </java>
+  </goal>
+  
+  
+  <preGoal name="test:test">
+  	<attainGoal name="uberjar-test"/>
+  </preGoal>
+  
+  <goal name="uberjar-test" prereqs="java:compile,jar.revolt,build-abcd,build-nested,build-test-data">
+  	<echo>Creating ${maven.build.dir}/uberjar-test.jar</echo>
+  	
+  	<!-- Copy the static jar files -->
+  	<copy todir="${maven.build.dir}/uberjar/">
+  		<fileset dir="${maven.build.dir}/test-data/uberjar">
+  			<includes name="**/*"/>
+  		</fileset>
+		<fileset dir="${maven.build.dir}/test-data">
+  			<include name="a.jar"/>
+			<include name="b.jar"/>
+			<include name="c.jar"/>
+			<include name="d.jar"/>
+		</fileset>
+  	</copy>
+  	
+  	<!-- Copy the bootstrap classes -->
+  	<copy todir="${maven.build.dir}/uberjar">
+  		<fileset dir="${maven.build.dir}/classes">
+  			<include name="org/codehaus/classworlds/uberjar/boot/Bootstrapper.class"/>
+  			<include name="org/codehaus/classworlds/uberjar/boot/InitialClassLoader.class"/>
+  			<include name="org/codehaus/classworlds/uberjar/protocol/jar/Handler.class"/>
+  			<include name="org/codehaus/classworlds/uberjar/protocol/jar/JarUrlConnection.class"/>
+  			<include name="org/codehaus/classworlds/UrlUtils.class"/>               
+  		</fileset>
+  	</copy>
+  	
+  	<!-- Create the classworlds.jar -->
+    <ant:mkdir dir="${maven.build.dir}/uberjar/WORLDS-INF"/>
+    <ant:jar
+      jarfile="${maven.build.dir}/uberjar/WORLDS-INF/classworlds.jar"
+      basedir="${maven.build.dir}/classes"/>
+  	
+  	
+  	<!-- Copy the revolt jar (contains main) -->
+  	<ant:copy file="${maven.build.dir}/revolt.jar"
+  		  todir="${maven.build.dir}/uberjar/WORLDS-INF/lib"/>
+  		  
+    <!-- Jar it up -->
+    <jar
+      jarfile="${maven.build.dir}/uberjar-test.jar"
+      basedir="${maven.build.dir}/uberjar">
+      <manifest>
+        <attribute name="Main-Class" value="org.codehaus.classworlds.uberjar.boot.Bootstrapper"/>
+      </manifest>
+    </jar>
+    
+  </goal>
+  
+  <postGoal name="test:test">
+    <java 
+        jar="${maven.build.dir}/uberjar-test.jar" 
+        fork="true"
+        failonerror="true"/>
+  </postGoal>
+
+  <preGoal name="test:test">
+	<attainGoal name="build-test-data"/>
+  </preGoal>
+
+  <goal name="build-test-data">
+	<ant:copy todir="${maven.build.dir}/test-data">
+		<fileset dir="src/test-data" includes="**/*"/>
+	</ant:copy>
+  </goal>
+
+  <goal name="compile-abcd" prereqs="java:compile">
+    <mkdir dir="${maven.build.dir}/abcd-classes"/>
+    <javac 
+     destdir="${maven.build.dir}/abcd-classes"
+     debug="on"
+	 classpath="${maven.build.dest}"
+     srcdir="${basedir}/src/java/abcd/"/>
+  </goal>
+
+  <goal name="build-abcd" prereqs="compile-abcd,build-test-data">
+	<mkdir dir="${maven.build.dir}/test-data"/>
+	<jar jarfile="${maven.build.dir}/test-data/a.jar">
+		<fileset dir="${maven.build.dir}/abcd-classes" includes="a/**"/>
+		<fileset dir="src/test-data" includes="a.properties"/>
+	</jar>
+    
+	<jar jarfile="${maven.build.dir}/test-data/b.jar"
+		 basedir="${maven.build.dir}/abcd-classes"
+		 includes="b/**"/>
+
+	<jar jarfile="${maven.build.dir}/test-data/c.jar"
+		 basedir="${maven.build.dir}/abcd-classes"
+		 includes="c/**"/>
+
+	<jar jarfile="${maven.build.dir}/test-data/d.jar"
+		 basedir="${maven.build.dir}/abcd-classes"
+		 includes="d/**"/>
+  </goal>
+
+  <goal name="build-nested" prereqs="build-abcd">
+	<mkdir dir="${maven.build.dir}/lib"/>
+    <copy todir="${maven.build.dir}/lib" file="${maven.build.dir}/test-data/a.jar"/>
+	<jar jarfile="${maven.build.dir}/test-data/nested.jar">
+	  <fileset dir="src/test-data" includes="nested.properties"/>
+	  <fileset dir="${maven.build.dir}" includes="lib/a.jar"/>
+	</jar>
+  </goal>
+
+</project>

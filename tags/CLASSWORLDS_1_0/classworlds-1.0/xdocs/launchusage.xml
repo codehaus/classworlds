@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+
+<document>
+
+  <properties>
+    <title>App Launching</title>
+    <author email="bob@eng.werken.com">bob mcwhirter</author>
+  </properties>
+
+  <body>
+
+  <section name="Introduction">
+
+    <subsection name="Purpose"> 
+
+      <p>
+      In order to reduce the number of classloading projects,
+      <code>classworlds</code> replaces <code>forehead</code>
+      for application launching.  
+      </p>
+
+      <p>
+      The main problems to solve in application launching include
+      locating all of application's JARs, configuring the initial
+      classloaders, and invoking the <code>main</code> entry method.
+      </p>
+
+      <p>
+      The launcher facilities of <code>classworlds</code> simplify
+      the process of locating application jars.  A common idiom is
+      to have a script which starts the JVM with only the 
+      <code>classworlds.jar</code> in the classpath and a system
+      property to specify the location of a launcher configuration.
+      Additionally, typically a property specifying the installation
+      location is passed on the command-line.
+      </p>
+
+<source><![CDATA[
+$JAVA_HOME/bin/java \
+    -classpath $APP_HOME/lib/classworlds-1.0.jar \
+    -Dclassworlds.conf=$APP_HOME/etc/classworlds.conf \
+    -Dapp.home=$APP_HOME \
+    org.codehaus.classworlds.Launcher \
+    $*
+]]></source>
+
+    </subsection>
+
+  </section>
+
+  <section name="Configuration">
+
+    <subsection name="Entry Definition">
+
+      <p>
+      The entry-point class and realm must be specified
+      using the <code>main is</code> directive before
+      specifying realm definitions. 
+      </p>
+
+<source><![CDATA[
+main is com.werken.projectz.Server from app
+]]></source>
+
+    </subsection>
+
+    <subsection name="Realm Definitions">
+
+      <p>
+      At least one <code>classworlds</code> realm must be defined
+      within the configuration file.  The syntax for starting a
+      realm definition is <code>[realm.name]</code>.  All lines
+      following the realm header are considered directives for 
+      that realm.  The realm definition continues either until
+      another realm is defined or until the end of the file is
+      reached.  
+      </p>
+
+<source><![CDATA[
+[realm.one]
+    ...
+    ...
+
+[realm.two]
+    ...
+    ...
+
+[realm.three]
+    ...
+    ...
+]]></source>
+
+      <p>
+      Within a realm definition, two directives are available:
+      <code>load</code> and <code>import</code>.  
+      </p>
+
+      <p>
+      The <code>load</code>
+      directive specifies a class source to be used for loading
+      classes in the realm.  Any loaded source that ends with
+      the <code>/</code> character is considered a directory
+      hierarchy of classes and resources and all others are
+      considered to be JAR files.  System properties may be
+      referred to using <code>${propname}</code> notation.
+      The <code>load</code> directive is equivelent to the
+      <code>addConstituent(..)</code> method of <code>ClassRealm</code>.
+      </p>
+
+<source><![CDATA[
+[app]
+    load ${app.home}/lib/myapp.jar
+    load ${app.home}/lib/xerces.jar
+    load ${tools.jar}
+]]></source>
+
+      <p>
+      The <code>import</code> directive specifies that certain
+      packages should be imported and loaded by way of another
+      realm.  The <code>import</code> directive is equivelent
+      to the <code>importFrom(..)</code> method of
+      <code>ClassRealm</code>.
+      </p>
+
+<source><![CDATA[
+[app]
+    ...
+  
+[subcomponent]
+    import com.werken.projectz.Foo from [app]
+    ...
+]]></source>
+
+    </subsection>
+
+    <subsection name="Entry point methods">
+
+      <p>
+      <code>classworlds</code> can be used to invoke any existing
+      application's <code>main()</code> method.  Using the standard
+      entry point does not allow for gaining access to the 
+      <code>ClassWorld</code> of the application, but not all 
+      applications will need it at run-time.
+      </p>
+
+      <p>
+      For those applications that do require the <code>ClassWorld</code>
+      instance, an alternative entry-point method signature can be
+      provide.  Simply add a <code>ClassWorld</code> parameter to 
+      the standard <code>main</code> parameter list.
+      </p>
+
+<source><![CDATA[
+public class MyApp
+{
+    public static void main(String[] args,
+                            ClassWorld world)
+    {
+        ...     
+    }
+}
+]]></source>
+
+    </subsection>
+
+  </section>
+
+  </body>
+
+</document>
