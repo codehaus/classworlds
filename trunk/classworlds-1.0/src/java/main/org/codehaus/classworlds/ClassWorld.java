@@ -113,9 +113,28 @@ public class ClassWorld
                                                id );
         }
 
-        DefaultClassRealm realm = new DefaultClassRealm( this,
-                                                         id, 
-                                                         classLoader);
+        ClassRealm realm = null;
+        
+        // Create a realm for the classloader that is parent realm.
+        // This bypasses parent ClassLoader issues.
+        if ( classLoader != null )
+        {
+            String parentRealmId = id + "_ParentRealm";
+            
+            DefaultClassRealm parentRealm = new DefaultClassRealm( this,
+                                                                   parentRealmId,
+                                                                   classLoader );
+            
+            realm = parentRealm.createChildRealm( id );
+            
+            this.realms.put( parentRealmId, parentRealm );
+        }
+        else
+        {
+            realm = new DefaultClassRealm( this,
+                                           id, 
+                                           null );
+        }
 
         this.realms.put( id,
                          realm );

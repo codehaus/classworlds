@@ -46,9 +46,11 @@ package org.codehaus.classworlds;
 
  */
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.MalformedURLException;
+import java.util.Enumeration;
 
 /** Classloader for <code>ClassRealm</code>s.
  *
@@ -174,8 +176,43 @@ class RealmClassLoader
         return super.getURLs();
     }
 
+    /** Find a resource within this ClassLoader only (don't delegate to the parent).
+     * 
+     *  @return The resource.
+     */
     public URL findResource( String name )
     {
         return super.findResource( name );
+    }
+
+    public URL getResource(String name)
+    {
+        return getRealm().getResource( name );
+    }
+
+    public Enumeration findResources(String name) throws IOException
+    {
+        return getRealm().findResources( name );
+    }
+    
+    /** Get a resource from this ClassLoader, and don't search the realm.
+     *  Otherwise we'd recurse indefinitely.
+     * 
+     *  @return The resource.
+     */
+    public URL getResourceFromClassLoader(String name)
+    {
+        return super.getResource( name );
+    }
+
+    /** Find resources from this ClassLoader, and don't search the realm.
+     *  Otherwise we'd recurse indefinitely.
+     * 
+     *  @return The resource.
+     */
+    public Enumeration findResourcesFromClassLoader(String name)
+        throws IOException
+    {
+        return super.findResources( name );
     }
 }

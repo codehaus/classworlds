@@ -46,7 +46,9 @@ package org.codehaus.classworlds;
 
  */
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 
 /** Autonomous sub-portion of a <code>ClassWorld</code>.
  *
@@ -113,6 +115,10 @@ public interface ClassRealm
 
     URL getResource( String name );
 
+    Enumeration findResources( String name ) throws IOException;
+
+    Enumeration getResources(String name) throws IOException;
+    
     /** Add a constituent to this realm for locating classes.
      *
      *  <p>
@@ -139,4 +145,5 @@ public interface ClassRealm
      * @param id The name of child realm.
      */
     ClassRealm createChildRealm( String id );
+
 }
