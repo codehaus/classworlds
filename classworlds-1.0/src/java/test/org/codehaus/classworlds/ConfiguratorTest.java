@@ -76,7 +76,7 @@ public class ConfiguratorTest extends TestCase
         this.configurator = null;
     }
 
-    public void testConfigure_Nonexistant() throws Exception
+    public void testConfigure_Nonexistent() throws Exception
     {
         try
         {
@@ -192,6 +192,69 @@ public class ConfiguratorTest extends TestCase
         assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/a.jar").toURL());
         assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/b.jar").toURL());
         assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/c.jar").toURL());
+    }
+
+    public void testConfigure_Optionally_NonExistent() throws Exception
+    {
+        this.configurator.configure( getConfigPath( "optionally-nonexistent.conf" ) );
+
+        assertEquals( "org.apache.maven.app.App",
+                      this.launcher.getMainClassName() );
+        
+        assertEquals( "opt",
+                      this.launcher.getMainRealmName() );
+
+        ClassWorld world = this.launcher.getWorld();
+
+        Collection realms = world.getRealms();
+
+        assertEquals( 1,
+                      realms.size() );
+
+        assertNotNull( world.getRealm( "opt" ) );
+
+        DefaultClassRealm optRealm = world.getRealmImpl( "opt" );
+
+        RealmClassLoader cl = (RealmClassLoader) optRealm.getClassLoader();
+
+        URL[] urls = cl.getURLs();
+
+        assertEquals( "no urls",
+                      0,
+                      urls.length );
+    }
+
+    public void testConfigure_Optionally_Existent() throws Exception
+    {
+        this.configurator.configure( getConfigPath( "optionally-existent.conf" ) );
+
+        assertEquals( "org.apache.maven.app.App",
+                      this.launcher.getMainClassName() );
+        
+        assertEquals( "opt",
+                      this.launcher.getMainRealmName() );
+
+        ClassWorld world = this.launcher.getWorld();
+
+        Collection realms = world.getRealms();
+
+        assertEquals( 1,
+                      realms.size() );
+
+        assertNotNull( world.getRealm( "opt" ) );
+
+        DefaultClassRealm optRealm = world.getRealmImpl( "opt" );
+
+        RealmClassLoader cl = (RealmClassLoader) optRealm.getClassLoader();
+
+        URL[] urls = cl.getURLs();
+
+        assertEquals( "one url",
+                      1,
+                      urls.length );
+
+        assertSame( optRealm,
+                    optRealm.locateSourceRealm( "org.xml.sax.SAXException" ) );
     }
 
     public void testConfigure_Unhandled() throws Exception
