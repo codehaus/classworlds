@@ -120,6 +120,9 @@
   		<fileset dir="${maven.build.dir}/test-data/uberjar">
   			<includes name="**/*"/>
   		</fileset>
+	</copy>
+
+	<copy todir="${maven.build.dir}/uberjar/WORLDS-INF/lib">
 		<fileset dir="${maven.build.dir}/test-data">
   			<include name="a.jar"/>
 			<include name="b.jar"/>
