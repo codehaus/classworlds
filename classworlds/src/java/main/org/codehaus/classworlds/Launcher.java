@@ -351,22 +351,22 @@ public class Launcher
 
     /**
      * Launch the launcher from the command line.
-     * Will exit using an exit code of 0 for success, 
-     * 100 if there was an unknown exception,
+     * Will exit using System.exit with an exit code of 0 for success, 100 if there was an unknown exception,
      * or some other code for an application error.
      *
      * @param args The application command-line arguments.
      */
-    public static int main( String[] args )
+    public static void main( String[] args )
     {
         try
         {
-            return mainWithExitCode( args );
+            int exitCode = mainWithExitCode( args );
+            System.exit( exitCode );
         }
         catch ( Exception e )
         {
             e.printStackTrace();
-            return 100;
+            System.exit( 100 );
         }
     }
 
