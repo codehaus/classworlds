@@ -76,18 +76,22 @@ public class UberJarRealmClassLoaderTest
         assertTrue( content.startsWith( "nested.properties" ) );
     }
 
-    public void testStandardJarUrl()
+    public void testLoadClass_Simple()
         throws Exception
     {
-        File testDir = new File( System.getProperty( "basedir" ), "target/test-data" );
-
-        URL url = new URL( "jar:file:" + testDir + "/a.jar!/" );
+        URL url = getJarUrl( "a.jar" );
 
         this.realm.addConstituent( url );
 
         RealmClassLoader cl = (RealmClassLoader) this.realm.getClassLoader();
 
-        cl.loadClass( "a.A" );
+        Class cls = cl.loadClass( "a.A" );
+
+        assertNotNull( cls );
+
+        cls = cl.loadClass( "java.lang.Object" );
+
+        assertNotNull( cls );
     }
 
 
@@ -174,6 +178,24 @@ public class UberJarRealmClassLoaderTest
         String content = getContent( in );
 
         assertTrue( content.startsWith( "a properties" ) );
+    }
+
+    public void testLoadClass_Nested()
+        throws Exception
+    {
+        URL url = buildUrl( "nested.jar", "!/lib/a.jar" );
+
+        this.realm.addConstituent( url );
+
+        RealmClassLoader cl = (RealmClassLoader) this.realm.getClassLoader();
+
+        Class cls = cl.loadClass( "a.A" );
+
+        assertNotNull( cls );
+
+        cls = cl.loadClass( "java.lang.Object" );
+
+        assertNotNull( cls );
     }
 
     protected URL getJarUrl( String jarName )
