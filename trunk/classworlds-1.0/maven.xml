@@ -1,5 +1,5 @@
 
-<project default="java:jar"
+<project default="jar:jar"
          xmlns:j="jelly:core">
 
   <postGoal name="clover">
@@ -36,7 +36,7 @@
     
   </goal>
   
-  <goal name="classworlds:assemble" prereqs="classworlds:build-boot-jar,java:jar">
+  <goal name="classworlds:assemble" prereqs="classworlds:build-boot-jar,jar:jar">
 
     <property name="assembly"   value="target/boot-assembly"/>
     <property name="worlds.inf" value="${assembly}/WORLDS-INF"/>
@@ -96,7 +96,7 @@
   </goal>
 
   <goal name="revolt"
-        prereqs="java:jar,jar.revolt">
+        prereqs="jar:jar,jar.revolt">
     <java classname="org.codehaus.classworlds.Launcher" fork="true">
       <classpath>
         <pathelement location="${maven.build.dir}/${maven.final.name}.jar"/>
