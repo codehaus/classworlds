@@ -53,6 +53,7 @@ import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -108,8 +109,8 @@ public class JarUrlConnection
         String extraText = "";
 
         if ( bangLoc <= ( baseText.length() - 2 )
-             &&
-             baseText.charAt( bangLoc + 1 ) == '/' )
+            &&
+            baseText.charAt( bangLoc + 1 ) == '/' )
         {
             if ( bangLoc + 2 == baseText.length() )
             {
@@ -276,6 +277,13 @@ public class JarUrlConnection
      */
     public JarFile getJarFile() throws IOException
     {
-        return new JarFile( getURL().getFile() );
+        String url = baseResource.toExternalForm();
+
+        if ( url.startsWith( "file:/" ) )
+        {
+            url = url.substring( 6 );
+        }
+
+        return new JarFile( URLDecoder.decode( url, "UTF-8" ) );
     }
 }
