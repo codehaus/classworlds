@@ -58,7 +58,15 @@ import java.util.Vector;
 
 
 /**
- * Implementation of <code>ClassRealm</code>.
+ * Implementation of <code>ClassRealm</code>.  The realm is the class loading gateway.
+ * The search is proceded as follows:
+ * <ol>
+ * <li>Search the parent class loader (passed via the constructor) if there
+ * is one.</li>
+ * <li>Search the imports.</li>
+ * <li>Search this realm's constituents.</li>
+ * <li>Search the parent realm.</li>
+ * </ol>
  *
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  * @author <a href="mailto:jason@zenplex.com">Jason van Zyl</a>
@@ -339,13 +347,25 @@ public class DefaultClassRealm
         // Find resources from the parent class loader
         if ( foreignClassLoader != null )
         {
-            for ( Enumeration res = classLoader.findResourcesDirect(name); res.hasMoreElements(); )
+            for ( Enumeration res = foreignClassLoader.getResources(name); res.hasMoreElements(); )
             {
                 resources.addElement(res.nextElement());
             }
         }
         
-		// Attempt to load directly first, then go to the imported packages.
+        // Load imports
+        ClassRealm sourceRealm = locateSourceRealm( name );
+        
+        if ( sourceRealm != this )
+        {
+        	// Attempt to load directly first, then go to the imported packages.
+            for ( Enumeration res = sourceRealm.findResources(name); res.hasMoreElements(); )
+            {
+                resources.addElement(res.nextElement());
+            }
+        }
+
+		// Load from our classloader
 		for ( Enumeration direct = classLoader.findResourcesDirect(name); direct.hasMoreElements(); )
 		{
 			resources.addElement(direct.nextElement());
@@ -354,15 +374,11 @@ public class DefaultClassRealm
 		// Find resources from the parent realm.
 		if (parent != null)
 		{
-			Enumeration parent = getParent().findResources(name);
-
-			while (parent.hasMoreElements())
+			for ( Enumeration parent = getParent().findResources(name); parent.hasMoreElements(); )
             {
 				resources.addElement(parent.nextElement());
             }
 		}
-
-		// TODO: get resources from imports too!
 
 		return resources.elements();
 	}
