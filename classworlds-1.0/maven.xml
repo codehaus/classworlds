@@ -37,7 +37,7 @@
     
   </goal>
   
-  <goal name="classworlds:assemble" prereqs="classworlds:build-boot-jar,jar:jar,build-abcd,build-test-data">
+  <goal name="classworlds:assemble" prereqs="classworlds:build-boot-jar,jar:jar,build-abcd,build-nested,build-test-data">
 
     <property name="assembly"   value="target/boot-assembly"/>
     <property name="worlds.inf" value="${assembly}/WORLDS-INF"/>
@@ -111,7 +111,7 @@
   	<attainGoal name="uberjar-test"/>
   </preGoal>
   
-  <goal name="uberjar-test" prereqs="java:compile,jar.revolt,build-abcd,build-test-data">
+  <goal name="uberjar-test" prereqs="java:compile,jar.revolt,build-abcd,build-nested,build-test-data">
   	<echo>Creating ${maven.build.dir}/uberjar-test.jar</echo>
   	
   	<!-- Copy the static jar files -->
@@ -203,6 +203,15 @@
 	<jar jarfile="${maven.build.dir}/test-data/d.jar"
 		 basedir="${maven.build.dir}/abcd-classes"
 		 includes="d/**"/>
+  </goal>
+
+  <goal name="build-nested" prereqs="build-abcd">
+	<mkdir dir="${maven.build.dir}/lib"/>
+    <copy todir="${maven.build.dir}/lib" file="${maven.build.dir}/test-data/a.jar"/>
+	<jar jarfile="${maven.build.dir}/test-data/nested.jar">
+	  <fileset dir="src/test-data" includes="nested.properties"/>
+	  <fileset dir="${maven.build.dir}" includes="lib/a.jar"/>
+	</jar>
   </goal>
 
 </project>
