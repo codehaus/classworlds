@@ -40,7 +40,7 @@ $JAVA_HOME/bin/java \
     -classpath $APP_HOME/lib/classworlds-1.0.jar \
     -Dclassworlds.conf=$APP_HOME/etc/classworlds.conf \
     -Dapp.home=$APP_HOME \
-    com.werken.classworlds.Launcher \
+    org.codehaus.classworlds.Launcher \
     $*
 ]]></source>
 
