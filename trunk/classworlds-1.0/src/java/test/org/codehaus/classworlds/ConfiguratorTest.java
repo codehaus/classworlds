@@ -188,10 +188,10 @@ public class ConfiguratorTest extends TestCase
         RealmClassLoader cl = (RealmClassLoader) globRealm.getClassLoader();
         URL[] urls = cl.getURLs();
         
-        assertArrayContains(urls, new File(System.getProperty("basedir") + "/test-data/nested.jar").toURL());
-        assertArrayContains(urls, new File(System.getProperty("basedir") + "/test-data/a.jar").toURL());
-        assertArrayContains(urls, new File(System.getProperty("basedir") + "/test-data/b.jar").toURL());
-        assertArrayContains(urls, new File(System.getProperty("basedir") + "/test-data/c.jar").toURL());
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/nested.jar").toURL());
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/a.jar").toURL());
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/b.jar").toURL());
+        assertArrayContains(urls, new File(System.getProperty("basedir") + "/target/test-data/c.jar").toURL());
     }
 
     public void testConfigure_Unhandled() throws Exception
@@ -273,7 +273,7 @@ public class ConfiguratorTest extends TestCase
     {
         try
         {
-            String result = this.configurator.filter( "${gollygeewillikers}" );
+            this.configurator.filter( "${gollygeewillikers}" );
             fail( "throw ConfigurationException" );
         }
         catch (ConfigurationException e)
@@ -297,7 +297,7 @@ public class ConfiguratorTest extends TestCase
     private FileInputStream getConfigPath(String name)
         throws Exception
     {
-        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "test-data" ), name ) ) ;
+        return new FileInputStream( new File( new File( System.getProperty( "basedir" ), "target/test-data" ), name ) ) ;
     }
 
     private void assertArrayContains(URL[] array, URL url) throws Exception {

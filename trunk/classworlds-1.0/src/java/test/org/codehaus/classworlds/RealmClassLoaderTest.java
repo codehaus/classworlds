@@ -89,7 +89,7 @@ public class RealmClassLoaderTest
     public void testStandardJarUrl()
         throws Exception
     {
-        File testDir = new File ( System.getProperty( "basedir" ), "test-data" );
+        File testDir = new File ( System.getProperty( "basedir" ), "target/test-data" );
         URL url = new URL( "jar:file:" + testDir + "/a.jar!/" );
         // URL url = new URL( "file:" + testDir + "/a.jar" );
         
@@ -199,7 +199,7 @@ public class RealmClassLoaderTest
         throws Exception
     {
         File testDir = new File ( System.getProperty( "basedir" ),
-                                  "test-data" );
+                                  "target/test-data" );
 
         File jarFile = new File( testDir,
                                  jarName );
