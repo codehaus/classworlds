@@ -138,7 +138,8 @@ public class DefaultClassRealm
         throws NoSuchRealmException
     {
         imports.add( new Entry( getWorld().getRealm( realmId ), packageName ) );
-        imports.add( new Entry( getWorld().getRealm( realmId ), "/" + packageName.replaceAll(".", "/") ) );
+        imports.add( new Entry( getWorld().getRealm( realmId ), packageName.replace('.', '/') ) );
+        imports.add( new Entry( getWorld().getRealm( realmId ), "/" + packageName.replace('.', '/') ) );
     }
 
     public void addConstituent( URL constituent )
@@ -239,7 +240,24 @@ public class DefaultClassRealm
                 }
             }
 
-            return classLoader.loadClassDirect( name );
+            ClassRealm sourceRealm = locateSourceRealm( name );
+            
+            if ( sourceRealm == this )
+            {
+                return classLoader.loadClassDirect( name );
+            }
+            else
+            {
+                try
+                {
+                    return sourceRealm.loadClass( name );
+                }
+                catch ( ClassNotFoundException cnfe )
+                {
+                    // If we can't find it in an import, try loading directly.
+                    return classLoader.loadClassDirect( name );
+                }
+            }
         }
         catch ( ClassNotFoundException e )
         {
@@ -267,7 +285,21 @@ public class DefaultClassRealm
             }
         }
 
-        resource = classLoader.getResourceDirect( normPath );
+        ClassRealm sourceRealm = locateSourceRealm( name );
+        
+        if ( sourceRealm == this )
+        {
+            resource = classLoader.getResourceDirect( name );
+        }
+        else
+        {
+        	resource = sourceRealm.getResource( name );
+
+        	if ( resource == null )
+            {
+                resource = classLoader.getResourceDirect( name );
+            }
+        }
 
         if ( resource == null && getParent() != null )
         {
