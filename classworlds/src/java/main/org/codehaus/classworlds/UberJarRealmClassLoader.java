@@ -1,4 +1,4 @@
-package org.codehaus.classworlds.uberjar;
+package org.codehaus.classworlds;
 
 /*
  $Id$
@@ -46,9 +46,6 @@ package org.codehaus.classworlds.uberjar;
 
  */
 
-import org.codehaus.classworlds.ClassRealm;
-import org.codehaus.classworlds.DefaultClassRealm;
-import org.codehaus.classworlds.RealmClassLoader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -81,9 +78,9 @@ public class UberJarRealmClassLoader
 
     private Map jarIndexes;
 
-    public UberJarRealmClassLoader()
+    public UberJarRealmClassLoader( DefaultClassRealm realm )
     {
-        super();
+        super( realm );
 
         this.urls = new ArrayList();
 

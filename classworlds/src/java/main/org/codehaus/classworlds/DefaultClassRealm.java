@@ -46,14 +46,15 @@ package org.codehaus.classworlds;
 
  */
 
-import org.codehaus.classworlds.uberjar.UberJarRealmClassLoader;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeSet;
+import java.util.Vector;
 
 
 /**
@@ -100,11 +101,11 @@ public class DefaultClassRealm
 
         if ( "true".equals( System.getProperty( "classworlds.bootstrapped" ) ) )
         {
-            classLoader = new UberJarRealmClassLoader();
+            classLoader = new UberJarRealmClassLoader( this );
         }
         else
         {
-            classLoader = new RealmClassLoader();
+            classLoader = new RealmClassLoader( this );
         }
     }
 
@@ -137,13 +138,52 @@ public class DefaultClassRealm
         throws NoSuchRealmException
     {
         imports.add( new Entry( getWorld().getRealm( realmId ), packageName ) );
+        imports.add( new Entry( getWorld().getRealm( realmId ), packageName.replaceAll(".", "/") ) );
     }
 
     public void addConstituent( URL constituent )
     {
         classLoader.addConstituent( constituent );
     }
+    
+    /**
+     *  Adds a byte[] class definition as a constituent for locating classes.
+     *  Currently uses BytesURLStreamHandler to hold a reference of the byte[] in memory.
+     *  This ensures we have a unifed URL resource model for all constituents.
+     *  The code to cache to disk is commented out - maybe a property to choose which method?
+     *
+     *  @param name class name
+     *  @param b the class definition as a byte[]
+     */
+    public void addConstituent(String constituent,
+                               byte[] b) throws ClassNotFoundException
+    {
+        try
+        {
+            File path, file;
+            if (constituent.lastIndexOf('.') != -1)
+            {
+                path = new File("byteclass/" + constituent.substring(0, constituent.lastIndexOf('.') + 1).replace('.', File.separatorChar));
 
+                file = new File(path, constituent.substring(constituent.lastIndexOf('.') + 1) + ".class");
+            }
+            else
+            {
+                path = new File("byteclass/");
+
+                file = new File(path, constituent + ".class");
+            }
+
+            addConstituent( new URL( null,
+                                     file.toURL().toExternalForm(),
+                                     new BytesURLStreamHandler(b) ) );
+        }
+        catch (java.io.IOException e)
+        {
+            throw new ClassNotFoundException( "Couldn't load byte stream.", e );
+        }
+    }
+    
     public ClassRealm locateSourceRealm( String classname )
     {
         for ( Iterator iterator = imports.iterator(); iterator.hasNext(); )
@@ -174,12 +214,17 @@ public class DefaultClassRealm
     }
 
     // ----------------------------------------------------------------------
-    // Classloading
+    // ClassLoader API
     // ----------------------------------------------------------------------
 
-    public Class getClassFromRealm( ClassRealm realm, String name )
+    public Class loadClass( String name )
         throws ClassNotFoundException
     {
+        if ( name.startsWith( "org.codehaus.classworlds." ) )
+        {
+            return getWorld().loadClass( name );
+        }
+
         try
         {
             if ( foreignClassLoader != null )
@@ -194,11 +239,11 @@ public class DefaultClassRealm
                 }
             }
 
-            return realm.getClassLoader().loadClass( name );
+            return classLoader.loadClassDirect( name );
         }
         catch ( ClassNotFoundException e )
         {
-            if ( realm.getParent() != null )
+            if ( getParent() != null )
             {
                 return getParent().loadClass( name );
             }
@@ -207,51 +252,14 @@ public class DefaultClassRealm
         }
     }
 
-    private URL getResourceFromRealm( ClassRealm realm, String name )
-    {
-        URL resource = realm.getClassLoader().getResource( UrlUtils.normalizeUrlPath( name ) );
-
-        if ( resource == null && realm.getParent() != null )
-        {
-            return getResourceFromRealm( realm.getParent(), name );
-        }
-
-        return resource;
-    }
-
-    private Enumeration getResourcesFromRealm( ClassRealm realm, String name )
-        throws IOException
-    {
-        Enumeration resources = realm.getClassLoader().getResources( UrlUtils.normalizeUrlPath( name ) );
-
-        if ( resources == null && realm.getParent() != null )
-        {
-            return getResourcesFromRealm( realm.getParent(), name );
-        }
-
-        return resources;
-    }
-
-    // ----------------------------------------------------------------------
-    // ClassLoader API
-    // ----------------------------------------------------------------------
-
-    public Class loadClass( String name )
-        throws ClassNotFoundException
-    {
-        if ( name.startsWith( "org.codehaus.classworlds." ) )
-        {
-            return getWorld().loadClass( name );
-        }
-
-        return getClassFromRealm( locateSourceRealm( name ), name );
-    }
-
     public URL getResource( String name )
     {
+        URL resource = null;
+        String normPath = UrlUtils.normalizeUrlPath( name );
+        
         if ( foreignClassLoader != null )
         {
-            URL resource = foreignClassLoader.getResource( name );
+            resource = foreignClassLoader.getResource( normPath );
 
             if ( resource != null )
             {
@@ -259,23 +267,14 @@ public class DefaultClassRealm
             }
         }
 
-        return getResourceFromRealm( this, name );
-    }
+        resource = classLoader.getResourceDirect( normPath );
 
-    public Enumeration getResources( String name )
-        throws IOException
-    {
-        if ( foreignClassLoader != null )
+        if ( resource == null && getParent() != null )
         {
-            Enumeration resources = foreignClassLoader.getResources( name );
-
-            if ( resources != null )
-            {
-                return resources;
-            }
+            resource = getParent().getResource( name );
         }
 
-        return getResourcesFromRealm( this, name );
+        return resource;
     }
 
     public InputStream getResourceAsStream( String name )
@@ -298,4 +297,42 @@ public class DefaultClassRealm
 
         return is;
     }
+    
+    public Enumeration findResources(String name)
+        throws IOException
+	{
+		name = UrlUtils.normalizeUrlPath(name);
+
+		Vector resources = new Vector();
+
+        // Find resources from the parent class loader
+        if ( foreignClassLoader != null )
+        {
+            for ( Enumeration res = classLoader.findResourcesDirect(name); res.hasMoreElements(); )
+            {
+                resources.addElement(res.nextElement());
+            }
+        }
+        
+		// Attempt to load directly first, then go to the imported packages.
+		for ( Enumeration direct = classLoader.findResourcesDirect(name); direct.hasMoreElements(); )
+		{
+			resources.addElement(direct.nextElement());
+		}
+        
+		// Find resources from the parent realm.
+		if (parent != null)
+		{
+			Enumeration parent = getParent().findResources(name);
+
+			while (parent.hasMoreElements())
+            {
+				resources.addElement(parent.nextElement());
+            }
+		}
+
+		// TODO: get resources from imports too!
+
+		return resources.elements();
+	}
 }

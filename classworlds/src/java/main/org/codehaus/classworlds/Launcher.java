@@ -208,7 +208,9 @@ public class Launcher
                 continue;
             }
 
-            if ( paramTypes[1] != ClassWorld.class )
+            Class cwClass = getMainRealm().loadClass( ClassWorld.class.getName() );
+            Class cw2Class = ClassWorld.class;
+            if ( paramTypes[1] != cwClass )
             {
                 continue;
             }

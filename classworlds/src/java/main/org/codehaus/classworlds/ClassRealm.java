@@ -100,7 +100,7 @@ public interface ClassRealm
 
     URL getResource( String name );
 
-    Enumeration getResources( String name )
+    Enumeration findResources( String name )
         throws IOException;
 
     InputStream getResourceAsStream( String name );
