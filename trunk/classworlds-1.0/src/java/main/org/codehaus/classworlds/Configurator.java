@@ -85,7 +85,7 @@ class Configurator
 
     /** Load spec prefix. */
     public static final String LOAD_PREFIX = "load";
-
+    
     // ------------------------------------------------------------
     //     Instance members
     // ------------------------------------------------------------
@@ -160,13 +160,17 @@ class Configurator
             {
                 if ( mainSet )
                 {
-                    throw new ConfigurationException( "Duplicate main configuration (" + lineNo + "): " + line );
+                    throw new ConfigurationException( "Duplicate main configuration", lineNo, line );
                 }
 
                 String conf = line.substring( MAIN_PREFIX.length() ).trim();
 
                 int fromLoc = conf.indexOf( "from" );
-
+                if ( fromLoc < 0 )
+                {
+                    throw new ConfigurationException( "Missing from clause", lineNo, line );
+                }
+                
                 String mainClassName = conf.substring( 0,
                                                        fromLoc ).trim();
 
@@ -183,7 +187,7 @@ class Configurator
 
                 if ( rbrack < 0 )
                 {
-                    throw new ConfigurationException( "Invalid realm specifier (" + lineNo + "): " + line );
+                    throw new ConfigurationException( "Invalid realm specifier", lineNo, line );
                 }
 
                 String realmName = line.substring( 1,
@@ -198,12 +202,16 @@ class Configurator
             {
                 if ( curRealm == null )
                 {
-                    throw new ConfigurationException( "Unhandled import (" + lineNo +"): " + line );
+                    throw new ConfigurationException( "Unhandled import", lineNo, line );
                 }
 
                 String conf = line.substring( IMPORT_PREFIX.length() ).trim();
 
                 int fromLoc = conf.indexOf( "from" );
+                if ( fromLoc < 0 )
+                {
+                    throw new ConfigurationException( "Missing from clause", lineNo, line );
+                }
 
                 String importSpec = conf.substring( 0,
                                                     fromLoc ).trim();
@@ -247,7 +255,7 @@ class Configurator
             }
             else
             {
-                throw new ConfigurationException( "Unhandled configuration (" + lineNo +"): " + line );
+                throw new ConfigurationException( "Unhandled configuration", lineNo, line );
             }
         }
 
@@ -337,16 +345,12 @@ class Configurator
             new FilenameFilter() {
                 public boolean accept(File dir, String name)
                 {
-                    if ( prefix != null
-                         &&
-                         !name.startsWith( prefix ) )
+                    if ( !name.startsWith( prefix ) )
                     {
                         return false;
                     }
 
-                    if ( suffix != null
-                         &&
-                         !name.endsWith( suffix ) )
+                    if ( !name.endsWith( suffix ) )
                     {
                         return false;
                     }
