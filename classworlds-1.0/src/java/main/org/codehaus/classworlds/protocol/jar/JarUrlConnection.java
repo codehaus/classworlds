@@ -4,7 +4,7 @@ package org.codehaus.classworlds.protocol.jar;
  $Id$
 
  Copyright 2002 (C) The Werken Company. All Rights Reserved.
- 
+
  Redistribution and use of this software and associated documentation
  ("Software"), with or without modification, are permitted provided
  that the following conditions are met:
@@ -12,25 +12,25 @@ package org.codehaus.classworlds.protocol.jar;
  1. Redistributions of source code must retain copyright
     statements and notices.  Redistributions must also contain a
     copy of this document.
- 
+
  2. Redistributions in binary form must reproduce the
     above copyright notice, this list of conditions and the
     following disclaimer in the documentation and/or other
     materials provided with the distribution.
- 
+
  3. The name "classworlds" must not be used to endorse or promote
     products derived from this Software without prior written
     permission of The Werken Company.  For written permission,
     please contact bob@werken.com.
- 
+
  4. Products derived from this Software may not be called "classworlds"
     nor may "classworlds" appear in their names without prior written
     permission of The Werken Company. "classworlds" is a registered
     trademark of The Werken Company.
- 
+
  5. Due credit should be given to The Werken Company.
     (http://classworlds.werken.com/).
- 
+
  THIS SOFTWARE IS PROVIDED BY THE WERKEN COMPANY AND CONTRIBUTORS
  ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -43,7 +43,7 @@ package org.codehaus.classworlds.protocol.jar;
  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  OF THE POSSIBILITY OF SUCH DAMAGE.
- 
+
  */
 
 import java.io.IOException;
@@ -59,8 +59,8 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 /** <code>URLConnection</code> capable of handling multiply-nested jars.
- *  
- * 
+ *
+ *
  *  @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  *
  *  @version $Id$
@@ -80,7 +80,7 @@ public class JarUrlConnection
 
     /** Terminal input-stream. */
     private InputStream in;
-    
+
     // ----------------------------------------------------------------------
     //     Constructors
     // ----------------------------------------------------------------------
@@ -92,30 +92,37 @@ public class JarUrlConnection
      *  @throws IOException If an error occurs while attempting to initialize
      *          the connection.
      */
-    JarUrlConnection(URL url)
+    JarUrlConnection( URL url )
         throws IOException
     {
-        super( url = normaliseURL(url) );
+        super( url = normaliseURL( url ) );
+
         String baseText = url.getPath();
-        
-        int bangLoc = baseText.indexOf("!");
+
+        int bangLoc = baseText.indexOf( "!" );
+
         String baseResourceText = baseText.substring( 0, bangLoc );
+
         String extraText = "";
+
         if ( bangLoc <= ( baseText.length() - 2 )
              &&
              baseText.charAt( bangLoc + 1 ) == '/' )
         {
-            if (bangLoc + 2 == baseText.length()) {
-              extraText = "";
-            } else {
-              extraText = baseText.substring( bangLoc + 1 );
+            if ( bangLoc + 2 == baseText.length() )
+            {
+                extraText = "";
+            }
+            else
+            {
+                extraText = baseText.substring( bangLoc + 1 );
             }
         }
         else
         {
             throw new MalformedURLException( "No !/ in url: " + url.toExternalForm() );
         }
-        
+
 
         List segments = new ArrayList();
 
@@ -126,23 +133,26 @@ public class JarUrlConnection
             segments.add( tokens.nextToken() );
         }
 
-        this.segments = (String[]) segments.toArray( new String[ segments.size() ] );
+        this.segments = (String[]) segments.toArray( new String[segments.size()] );
 
         this.baseResource = new URL( baseResourceText );
     }
-    
-    protected static URL normaliseURL(URL url) throws MalformedURLException {
+
+    protected static URL normaliseURL( URL url ) throws MalformedURLException
+    {
         String text = url.toString();
-        
-        if (!text.startsWith("jar:")) {
+
+        if ( !text.startsWith( "jar:" ) )
+        {
             text = "jar:" + text;
         }
-        
-        if (text.indexOf('!') < 0) {
+
+        if ( text.indexOf( '!' ) < 0 )
+        {
             text = text + "!/";
         }
-        
-        return new URL(text);
+
+        return new URL( text );
     }
 
     // ----------------------------------------------------------------------
@@ -150,7 +160,7 @@ public class JarUrlConnection
     // ----------------------------------------------------------------------
 
     /** Retrieve the nesting path segments.
-     * 
+     *
      *  @return The segments.
      */
     protected String[] getSegments()
@@ -167,7 +177,7 @@ public class JarUrlConnection
         return this.baseResource;
     }
 
-    /** @see URLConnection
+    /** @see java.net.URLConnection
      */
     public void connect()
         throws IOException
@@ -200,13 +210,13 @@ public class JarUrlConnection
         throws IOException
     {
         InputStream curIn = getBaseResource().openStream();
-        
-        for ( int i = 0 ; i < this.segments.length ; ++i )
+
+        for ( int i = 0; i < this.segments.length; ++i )
         {
             curIn = getSegmentInputStream( curIn,
                                            segments[i] );
         }
-        
+
         this.in = curIn;
     }
 
@@ -220,12 +230,12 @@ public class JarUrlConnection
      *
      *  @throws IOException If an I/O error occurs.
      */
-    protected InputStream getSegmentInputStream(InputStream baseIn,
-                                                String segment)
+    protected InputStream getSegmentInputStream( InputStream baseIn,
+                                                 String segment )
         throws IOException
     {
         JarInputStream jarIn = new JarInputStream( baseIn );
-        JarEntry       entry = null;
+        JarEntry entry = null;
 
         while ( jarIn.available() != 0 )
         {
@@ -236,7 +246,7 @@ public class JarUrlConnection
                 break;
             }
 
-            if ( ("/" + entry.getName()).equals( segment ) )
+            if ( ( "/" + entry.getName() ).equals( segment ) )
             {
                 return jarIn;
             }
@@ -245,7 +255,7 @@ public class JarUrlConnection
         throw new IOException( "unable to locate segment: " + segment );
     }
 
-    /** @see URLConnection
+    /** @see java.net.URLConnection
      */
     public InputStream getInputStream()
         throws IOException
