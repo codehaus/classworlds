@@ -138,7 +138,7 @@ public class DefaultClassRealm
         throws NoSuchRealmException
     {
         imports.add( new Entry( getWorld().getRealm( realmId ), packageName ) );
-        imports.add( new Entry( getWorld().getRealm( realmId ), packageName.replaceAll(".", "/") ) );
+        imports.add( new Entry( getWorld().getRealm( realmId ), "/" + packageName.replaceAll(".", "/") ) );
     }
 
     public void addConstituent( URL constituent )

@@ -1,4 +1,4 @@
-package org.codehaus.classworlds.uberjar;
+package org.codehaus.classworlds;
 
 import junit.framework.TestCase;
 
