@@ -139,7 +139,6 @@ public class DefaultClassRealm
     {
         imports.add( new Entry( getWorld().getRealm( realmId ), packageName ) );
         imports.add( new Entry( getWorld().getRealm( realmId ), packageName.replace('.', '/') ) );
-        imports.add( new Entry( getWorld().getRealm( realmId ), "/" + packageName.replace('.', '/') ) );
     }
 
     public void addConstituent( URL constituent )
@@ -273,11 +272,11 @@ public class DefaultClassRealm
     public URL getResource( String name )
     {
         URL resource = null;
-        String normPath = UrlUtils.normalizeUrlPath( name );
+        name = UrlUtils.normalizeUrlPath( name );
         
         if ( foreignClassLoader != null )
         {
-            resource = foreignClassLoader.getResource( normPath );
+            resource = foreignClassLoader.getResource( name );
 
             if ( resource != null )
             {
