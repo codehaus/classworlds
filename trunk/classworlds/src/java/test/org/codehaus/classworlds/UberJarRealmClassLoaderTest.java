@@ -26,7 +26,9 @@ public class UberJarRealmClassLoaderTest
 
         world = new ClassWorld();
 
-        realm = this.world.newRealm( "realm" );
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        realm = this.world.newRealm( "realm", cl );
     }
 
     public void testFindResource_Simple()
