@@ -79,7 +79,7 @@ public class ClassWorld
     // ------------------------------------------------------------
     //     Instance methods
     // ------------------------------------------------------------
-
+    
     /** Create a new <code>ClassRealm</code>.
      *
      *  @param id The realm id.
@@ -91,6 +91,22 @@ public class ClassWorld
      */
     public ClassRealm newRealm(String id) throws DuplicateRealmException
     {
+        return newRealm(id, null);
+    }
+    
+    /** Create a new <code>ClassRealm</code>.
+     *
+     *  @param id The realm id.
+     *
+     *  @return The newly created realm.
+     *
+     *  @throws DuplicateRealmException If this class-world already
+     *          contains a realm with the specified id.
+     */
+    public ClassRealm newRealm(String id,
+                               ClassLoader classLoader)
+        throws DuplicateRealmException
+    {
         if ( this.realms.containsKey( id ) )
         {
             throw new DuplicateRealmException( this,
@@ -98,7 +114,8 @@ public class ClassWorld
         }
 
         DefaultClassRealm realm = new DefaultClassRealm( this,
-                                                   id );
+                                                         id, 
+                                                         classLoader);
 
         this.realms.put( id,
                          realm );

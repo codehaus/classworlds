@@ -86,7 +86,8 @@ public class ClassRealmImplTest extends TestCase
     public void testLocateSourceRealm_NoImports() throws Exception
     {
         DefaultClassRealm realm = new DefaultClassRealm( this.world,
-                                                   "foo" );
+                                                         "foo", 
+                                                         null );
 
         assertSame( realm,
                     realm.locateSourceRealm( "com.werken.Stuff" ) );

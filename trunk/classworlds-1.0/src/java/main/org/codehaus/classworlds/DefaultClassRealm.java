@@ -82,6 +82,9 @@ class DefaultClassRealm implements ClassRealm
     /** Parent ClassRealm */
     private ClassRealm parent;
 
+    /** Parent ClassRealm */
+    private ClassLoader parentClassLoader;
+    
     // ------------------------------------------------------------
     //     Constructors
     // ------------------------------------------------------------
@@ -90,13 +93,16 @@ class DefaultClassRealm implements ClassRealm
      *
      *  @param world The world of which this realm is a member.
      *  @param id This realm's id.
+     *  @param parentClassLoader The class loader which to inherit from.
      */
     DefaultClassRealm( ClassWorld world,
-                    String id )
+                       String id,
+                       ClassLoader parentClassLoader )
     {
         this.world = world;
         this.id = id;
-
+        this.parentClassLoader = parentClassLoader;
+        
         this.imports = new TreeSet();
 
         // We need to detect whether we are running in an UberJar
@@ -107,7 +113,7 @@ class DefaultClassRealm implements ClassRealm
         }
         else
         {
-            this.classLoader = new RealmClassLoader( this );
+            this.classLoader = new RealmClassLoader( this, parentClassLoader );
         }
     }
 
@@ -320,7 +326,7 @@ class DefaultClassRealm implements ClassRealm
      */
     public ClassRealm createChildRealm( String id )
     {
-        ClassRealm childRealm = new DefaultClassRealm( getWorld(), id );
+        ClassRealm childRealm = new DefaultClassRealm( getWorld(), id, parentClassLoader );
         childRealm.setParent( this );
 
         return childRealm;
