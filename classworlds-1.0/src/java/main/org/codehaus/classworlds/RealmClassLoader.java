@@ -4,7 +4,7 @@ package org.codehaus.classworlds;
  $Id$
 
  Copyright 2002 (C) The Werken Company. All Rights Reserved.
- 
+
  Redistribution and use of this software and associated documentation
  ("Software"), with or without modification, are permitted provided
  that the following conditions are met:
@@ -12,25 +12,25 @@ package org.codehaus.classworlds;
  1. Redistributions of source code must retain copyright
     statements and notices.  Redistributions must also contain a
     copy of this document.
- 
+
  2. Redistributions in binary form must reproduce the
     above copyright notice, this list of conditions and the
     following disclaimer in the documentation and/or other
     materials provided with the distribution.
- 
+
  3. The name "classworlds" must not be used to endorse or promote
     products derived from this Software without prior written
     permission of The Werken Company.  For written permission,
     please contact bob@werken.com.
- 
+
  4. Products derived from this Software may not be called "classworlds"
     nor may "classworlds" appear in their names without prior written
     permission of The Werken Company. "classworlds" is a registered
     trademark of The Werken Company.
- 
+
  5. Due credit should be given to The Werken Company.
     (http://classworlds.werken.com/).
- 
+
  THIS SOFTWARE IS PROVIDED BY THE WERKEN COMPANY AND CONTRIBUTORS
  ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -43,7 +43,7 @@ package org.codehaus.classworlds;
  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  OF THE POSSIBILITY OF SUCH DAMAGE.
- 
+
  */
 
 import java.net.URL;
@@ -56,7 +56,7 @@ import java.net.MalformedURLException;
  *
  *  @version $Id$
  */
-class RealmClassLoader 
+class RealmClassLoader
     extends URLClassLoader
 {
     // ------------------------------------------------------------
@@ -64,7 +64,7 @@ class RealmClassLoader
     // ------------------------------------------------------------
 
     /** The realm. */
-    protected ClassRealmImpl realm;
+    protected DefaultClassRealm realm;
 
     // ------------------------------------------------------------
     //     Constructors
@@ -74,7 +74,7 @@ class RealmClassLoader
      *
      *  @param realm The realm for which this loads.
      */
-    RealmClassLoader(ClassRealmImpl realm)
+    RealmClassLoader(DefaultClassRealm realm)
     {
         super( new URL[0] );
         this.realm = realm;
@@ -88,7 +88,7 @@ class RealmClassLoader
      *
      *  @return The realm.
      */
-    ClassRealmImpl getRealm()
+    DefaultClassRealm getRealm()
     {
         return this.realm;
     }
@@ -126,7 +126,7 @@ class RealmClassLoader
      *
      *  @param name The name of the class to load.
      *
-     *  @return The loaded class. 
+     *  @return The loaded class.
      *
      *  @throws ClassNotFoundException If the class could not be found.
      */
@@ -135,16 +135,16 @@ class RealmClassLoader
         return super.loadClass( name, true );
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     //     java.lang.ClassLoader
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     /** Load a class.
      *
      *  @param name The name of the class to load.
      *  @param resolve If <code>true</code> then resolve the class.
      *
-     *  @return The loaded class. 
+     *  @return The loaded class.
      *
      *  @throws ClassNotFoundException If the class cannot be found.
      */
@@ -166,5 +166,5 @@ class RealmClassLoader
     public URL findResource( String name )
     {
         return super.findResource( name );
-    }        
+    }
 }

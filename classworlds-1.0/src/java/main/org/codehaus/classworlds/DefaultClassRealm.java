@@ -61,7 +61,7 @@ import java.util.Iterator;
  * @todo allow inheritance to be turn on/off at runtime.
  * @todo allow direction of search
  */
-class ClassRealmImpl implements ClassRealm
+class DefaultClassRealm implements ClassRealm
 {
     // ------------------------------------------------------------
     //     Instance members
@@ -91,7 +91,7 @@ class ClassRealmImpl implements ClassRealm
      *  @param world The world of which this realm is a member.
      *  @param id This realm's id.
      */
-    ClassRealmImpl( ClassWorld world,
+    DefaultClassRealm( ClassWorld world,
                     String id )
     {
         this.world = world;
@@ -190,7 +190,7 @@ class ClassRealmImpl implements ClassRealm
      *
      *  @return The appropriate realm.
      */
-    ClassRealmImpl locateSourceRealm( String classname )
+    DefaultClassRealm locateSourceRealm( String classname )
     {
         Iterator entryIter = this.imports.iterator();
 
@@ -232,7 +232,7 @@ class ClassRealmImpl implements ClassRealm
             return getWorld().loadClass( name );
         }
 
-        ClassRealmImpl sourceRealm = locateSourceRealm( name );
+        DefaultClassRealm sourceRealm = locateSourceRealm( name );
 
         if ( sourceRealm == this )
         {
@@ -287,7 +287,7 @@ class ClassRealmImpl implements ClassRealm
     {
         name = UrlUtils.normalizeUrlPath( name );
 
-        ClassRealmImpl sourceRealm = locateSourceRealm( name );
+        DefaultClassRealm sourceRealm = locateSourceRealm( name );
 
         if ( sourceRealm == this )
         {
@@ -320,7 +320,7 @@ class ClassRealmImpl implements ClassRealm
      */
     public ClassRealm createChildRealm( String id )
     {
-        ClassRealm childRealm = new ClassRealmImpl( getWorld(), id );
+        ClassRealm childRealm = new DefaultClassRealm( getWorld(), id );
         childRealm.setParent( this );
 
         return childRealm;

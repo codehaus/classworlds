@@ -4,7 +4,7 @@ package org.codehaus.classworlds;
  $Id$
 
  Copyright 2002 (C) The Werken Company. All Rights Reserved.
- 
+
  Redistribution and use of this software and associated documentation
  ("Software"), with or without modification, are permitted provided
  that the following conditions are met:
@@ -12,25 +12,25 @@ package org.codehaus.classworlds;
  1. Redistributions of source code must retain copyright
     statements and notices.  Redistributions must also contain a
     copy of this document.
- 
+
  2. Redistributions in binary form must reproduce the
     above copyright notice, this list of conditions and the
     following disclaimer in the documentation and/or other
     materials provided with the distribution.
- 
+
  3. The name "classworlds" must not be used to endorse or promote
     products derived from this Software without prior written
     permission of The Werken Company.  For written permission,
     please contact bob@werken.com.
- 
+
  4. Products derived from this Software may not be called "classworlds"
     nor may "classworlds" appear in their names without prior written
     permission of The Werken Company. "classworlds" is a registered
     trademark of The Werken Company.
- 
+
  5. Due credit should be given to The Werken Company.
     (http://classworlds.werken.com/).
- 
+
  THIS SOFTWARE IS PROVIDED BY THE WERKEN COMPANY AND CONTRIBUTORS
  ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -43,7 +43,7 @@ package org.codehaus.classworlds;
  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  OF THE POSSIBILITY OF SUCH DAMAGE.
- 
+
  */
 
 import java.net.URL;
@@ -59,7 +59,7 @@ import java.util.jar.JarInputStream;
 import java.util.jar.JarEntry;
 
 /** Classloader for <code>ClassRealm</code>s.
- * 
+ *
  *  Loads classes from an "uberjar".
  *
  *  @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
@@ -94,12 +94,14 @@ class UberJarRealmClassLoader
      *
      *  @param realm The realm for which this loads.
      */
-    UberJarRealmClassLoader(ClassRealmImpl realm)
+    UberJarRealmClassLoader( DefaultClassRealm realm )
     {
         super( realm );
 
         this.urls = new ArrayList();
+
         this.classIndex = new HashMap();
+
         this.jarIndexes = new HashMap();
     }
 
@@ -111,7 +113,7 @@ class UberJarRealmClassLoader
      *
      *  @return The realm.
      */
-    ClassRealmImpl getRealm()
+    DefaultClassRealm getRealm()
     {
         return this.realm;
     }
@@ -120,11 +122,11 @@ class UberJarRealmClassLoader
      *
      *  @param constituent URL to contituent jar or directory.
      */
-    void addConstituent(URL constituent)
+    void addConstituent( URL constituent )
     {
         // If the constituent is a jar, build an index for it.
         if ( "jar".equals( constituent.getProtocol() )
-             || constituent.toExternalForm().endsWith( ".jar" ) )
+              || constituent.toExternalForm().endsWith( ".jar" ) )
         {
             buildIndexForJar( constituent );
         }
@@ -166,13 +168,13 @@ class UberJarRealmClassLoader
             try
             {
                 JarEntry entry = null;
-                
-                while ((entry = in.getNextJarEntry()) != null)
+
+                while ( ( entry = in.getNextJarEntry() ) != null )
                 {
                     resourceName = entry.getName();
-                    
+
                     resourceUrl = new URL( urlText + "!/" + resourceName );
-                    
+
                     index.put( resourceName, resourceUrl );
                 }
             }
@@ -181,7 +183,7 @@ class UberJarRealmClassLoader
                 in.close();
             }
         }
-        catch (IOException e)
+        catch ( IOException e )
         {
             // swallow
         }
@@ -194,11 +196,11 @@ class UberJarRealmClassLoader
      *
      *  @param className The name of the class to load.
      *
-     *  @return The loaded class. 
+     *  @return The loaded class.
      *
      *  @throws ClassNotFoundException If the class could not be found.
      */
-    Class loadClassDirect(String className) throws ClassNotFoundException
+    Class loadClassDirect( String className ) throws ClassNotFoundException
     {
         String classPath = className.replace( '.',
                                               '/' ) + ".class";
@@ -209,19 +211,19 @@ class UberJarRealmClassLoader
         }
 
         Iterator urlIter = this.urls.iterator();
-        URL      eachUrl = null;
+        URL eachUrl = null;
 
-        byte[]   classBytes = null;
+        byte[] classBytes = null;
 
         while ( ( classBytes == null )
-                &&
-                ( urlIter.hasNext() ) )
+            &&
+            ( urlIter.hasNext() ) )
         {
             eachUrl = (URL) urlIter.next();
-            
+
             if ( "jar".equals( eachUrl.getProtocol() )
-                 ||
-                 eachUrl.toExternalForm().endsWith( ".jar" ) )
+                ||
+                eachUrl.toExternalForm().endsWith( ".jar" ) )
             {
                 classBytes = findClassInJarStream( eachUrl,
                                                    classPath );
@@ -243,43 +245,43 @@ class UberJarRealmClassLoader
                                      classBytes,
                                      0,
                                      classBytes.length );
-            
+
             this.classIndex.put( classPath,
                                  cls );
-            
+
             return cls;
         }
-        
+
         // return super.loadClassDirect( name );
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     //     java.lang.ClassLoader
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     /** @see ClassLoader
      */
-    public URL getResource(String name)
+    public URL getResource( String name )
     {
         return getRealm().getResource( name );
     }
 
     /** @see ClassLoader
      */
-    public URL findResource(String name)
+    public URL findResource( String name )
     {
         URL resourceUrl = null;
 
         Iterator urlIter = this.urls.iterator();
-        URL      eachUrl = null;
+        URL eachUrl = null;
 
         while ( urlIter.hasNext() )
         {
             eachUrl = (URL) urlIter.next();
 
             if ( "jar".equals( eachUrl.getProtocol() )
-                 ||
-                 eachUrl.toExternalForm().endsWith( ".jar" ) )
+                ||
+                eachUrl.toExternalForm().endsWith( ".jar" ) )
             {
                 resourceUrl = findResourceInJarStream( eachUrl,
                                                        name );
@@ -289,7 +291,7 @@ class UberJarRealmClassLoader
                 resourceUrl = findResourceInDirectoryUrl( eachUrl,
                                                           name );
             }
-            
+
             if ( resourceUrl != null )
             {
                 return resourceUrl;
@@ -306,10 +308,10 @@ class UberJarRealmClassLoader
      *
      *  @return The resource URL or <code>null</code> if none found.
      */
-    protected URL findResourceInJarStream(URL inUrl,
-                                          String path)
+    protected URL findResourceInJarStream( URL inUrl,
+                                           String path )
     {
-        return ( URL ) ( ( Map ) jarIndexes.get( inUrl ) ).get( path );
+        return (URL) ( (Map) jarIndexes.get( inUrl ) ).get( path );
     }
 
     /** Find a resource that potentially exists within a directory.
@@ -319,12 +321,12 @@ class UberJarRealmClassLoader
      *
      *  @return The resource URL or <code>null</code> if none found.
      */
-    protected URL findResourceInDirectoryUrl(URL inUrl,
-                                             String path)
+    protected URL findResourceInDirectoryUrl( URL inUrl,
+                                              String path )
     {
         return null;
     }
-    
+
     /** Attempt to load the bytes of a class from a JAR <code>URL</code>.
      *
      *  @param inUrl The base url.
@@ -333,10 +335,10 @@ class UberJarRealmClassLoader
      *  @return The class bytes or <code>null</code> if not available
      *          via the base url.
      */
-    protected byte[] findClassInJarStream(URL inUrl,
-                                          String path)
+    protected byte[] findClassInJarStream( URL inUrl,
+                                           String path )
     {
-        URL classUrl = ( URL ) ( ( Map ) jarIndexes.get( inUrl ) ).get( path );
+        URL classUrl = (URL) ( (Map) jarIndexes.get( inUrl ) ).get( path );
 
         if ( classUrl != null )
         {
@@ -361,19 +363,19 @@ class UberJarRealmClassLoader
      *  @return The class bytes or <code>null</code> if not available
      *          via the base url.
      */
-    protected byte[] findClassInDirectoryUrl(URL url,
-                                             String path)
+    protected byte[] findClassInDirectoryUrl( URL url,
+                                              String path )
     {
         try
         {
             URL classUrl = new URL( url,
                                     path );
         }
-        catch (IOException e)
+        catch ( IOException e )
         {
             // swallow
         }
-            
+
         return null;
     }
 
@@ -382,12 +384,12 @@ class UberJarRealmClassLoader
      *  @param name The name of the class to load.
      *  @param resolve If <code>true</code> then resolve the class.
      *
-     *  @return The loaded class. 
+     *  @return The loaded class.
      *
      *  @throws ClassNotFoundException If the class cannot be found.
      */
-    protected Class loadClass(String name,
-                              boolean resolve) throws ClassNotFoundException
+    protected Class loadClass( String name,
+                               boolean resolve ) throws ClassNotFoundException
     {
         return getRealm().loadClass( name );
     }
@@ -402,7 +404,7 @@ class UberJarRealmClassLoader
 
         try
         {
-            byte[] buffer = new byte[ 2048 ];
+            byte[] buffer = new byte[2048];
 
             int read = 0;
 
@@ -425,5 +427,4 @@ class UberJarRealmClassLoader
             out.close();
         }
     }
-
 }
