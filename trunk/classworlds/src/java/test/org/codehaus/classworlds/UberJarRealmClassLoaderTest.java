@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.ClassRealm;
@@ -58,6 +59,31 @@ public class UberJarRealmClassLoaderTest
         }
 
         assertTrue( content.toString().startsWith( "nested.properties" ) );
+    }
+
+    public void testFindResources_Simple()
+        throws Exception
+    {
+        URL url = getJarUrl( "nested.jar" );
+
+        this.realm.addConstituent( url );
+
+        RealmClassLoader cl = (RealmClassLoader) this.realm.getClassLoader();
+
+        Enumeration e = cl.findResources( "nested.properties" );
+
+        assertNotNull( e );
+
+        int resourceCount = 0;
+
+        for ( Enumeration resources = e; resources.hasMoreElements(); )
+        {
+            resources.nextElement();
+
+            resourceCount++;
+        }
+
+        assertEquals( 1, resourceCount );
     }
 
     public void testGetResourceAsStream_Simple()
@@ -162,6 +188,31 @@ public class UberJarRealmClassLoaderTest
         String content = getContent( in );
 
         assertTrue( content.startsWith( "a properties" ) );
+    }
+
+    public void testFindResources_Nested()
+        throws Exception
+    {
+        URL url = buildUrl( "nested.jar", "!/lib/a.jar" );
+
+        this.realm.addConstituent( url );
+
+        RealmClassLoader cl = (RealmClassLoader) this.realm.getClassLoader();
+
+        Enumeration e = cl.findResources( "a.properties" );
+
+        assertNotNull( e );
+
+        int resourceCount = 0;
+
+        for ( Enumeration resources = e; resources.hasMoreElements(); )
+        {
+            resources.nextElement();
+
+            resourceCount++;
+        }
+
+        assertEquals( 1, resourceCount );
     }
 
     public void testGetResourceAsStream_Nested()
