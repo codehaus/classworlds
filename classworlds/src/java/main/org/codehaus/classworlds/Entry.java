@@ -59,10 +59,6 @@ class Entry implements Comparable
 
     Entry( ClassRealm realm, String pkgName )
     {
-        System.out.println( "realm = " + realm );
-
-        System.out.println( "pkgName = " + pkgName );
-
         this.realm = realm;
 
         this.pkgName = pkgName;
