@@ -23,7 +23,20 @@
         in JIRA.
       </action>
     </release>
-    <release version="1.1" date="in CVS">
+    <release version="1.1-alpha-1" date="in CVS">
+      <action dev="dandiep" type="feature">
+        Added support better support for resources.
+      </action>
+      <action dev="dandiep" type="feature">
+        Classloading happens now in this order:
+        <ul>
+          <li>Imports</li>
+          <li>Local class realm</li>
+          <li>Parent realm</li>
+        </ul>
+        This is subject to change and will probably be configurable in
+        the future.
+      </action>
     </release>
   </body>
 </document>
