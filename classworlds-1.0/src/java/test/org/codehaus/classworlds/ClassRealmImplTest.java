@@ -267,8 +267,7 @@ public class ClassRealmImplTest extends TestCase
 
         assertNotNull( cls );
 
-        assertSame( ClassWorld.class,
-                    cls );
+        assertSame( ClassWorld.class, cls );
     }
 
     public void testLoadClass_Local() throws Exception
@@ -349,6 +348,21 @@ public class ClassRealmImplTest extends TestCase
         assertSame( classA,
                     classMain );
     }
+    
+    public void testLoadClass_Package() throws Exception
+    {
+        ClassRealm realmA = this.world.newRealm( "realmA" );
+        realmA.addConstituent( getJarUrl( "a.jar" ) );
+        
+        Class clazz = realmA.loadClass( "a.A" );
+        assertNotNull(clazz);
+        assertEquals("a.A", clazz.getName());
+        
+        Package p = clazz.getPackage();
+        assertNotNull(p);
+        assertEquals("p.getName()", "a", p.getName());        
+    }
+        
 
     public void testLoadClass_Complex() throws Exception
     {
