@@ -85,6 +85,8 @@ public class RealmClassLoader
         addURL( constituent );
     }
 
+    // We are loading from this classloader first
+
     public synchronized Class loadClass( String className )
         throws ClassNotFoundException
     {

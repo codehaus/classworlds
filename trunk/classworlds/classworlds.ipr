@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4" relativePaths="false">
   <component name="AntConfiguration" />
-  <component name="CodeStyleManager">
-    <option name="USE_DEFAULT_CODE_STYLE_SCHEME" value="true" />
-    <option name="CODE_STYLE_SCHEME" value="" />
-  </component>
   <component name="CodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS" />
     <option name="USE_PER_PROJECT_SETTINGS" value="false" />
@@ -17,13 +13,14 @@
       <entry name=".+\.(gif|png|jpeg)" />
     </resourceExtensions>
   </component>
+  <component name="CvsManager" />
   <component name="DataSourceManager" />
   <component name="EjbActionsConfiguration">
     <option name="NEW_MESSAGE_BEAN_LAST_PACKAGE" value="" />
     <option name="NEW_ENTITY_BEAN_LAST_PACKAGE" value="" />
     <option name="NEW_SESSION_BEAN_LAST_PACKAGE" value="" />
   </component>
-  <component name="EjbManager" enabled="false" />
+  <component enabled="false" name="EjbManager" />
   <component name="EntryPointsManager">
     <entry_points />
   </component>
@@ -75,9 +72,14 @@
   </component>
   <component name="ProjectRootManager" version="2" assert-keyword="false" />
   <component name="WebManager">
-    <option enabled="false" />
+    <OPTION enabled="false" />
   </component>
   <component name="WebRootContainer" />
+  <component name="copyright">
+    <option name="body" value="/*&#10; * Copyright (c) $today.year Your Corporation. All Rights Reserved.&#10; */" />
+    <option name="location" value="1" />
+    <option name="remove" value="true" />
+  </component>
   <component name="libraryTable" />
   <component name="uidesigner-configuration">
     <option name="INSTRUMENT_CLASSES" value="true" />
