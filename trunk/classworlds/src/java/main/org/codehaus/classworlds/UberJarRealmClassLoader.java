@@ -234,7 +234,7 @@ public class UberJarRealmClassLoader
         return null;
     }
 
-    public Enumeration findResourcesFromClassLoader( String name )
+    public Enumeration findResourcesDirect( String name )
     {
         Vector list = new Vector();
 
