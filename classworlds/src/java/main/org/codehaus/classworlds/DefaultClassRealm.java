@@ -51,7 +51,6 @@ import org.codehaus.classworlds.uberjar.UberJarRealmClassLoader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -75,7 +74,9 @@ public class DefaultClassRealm
 
     private TreeSet imports;
 
-    private ClassLoader classLoader;
+    private ClassLoader foreignClassLoader;
+
+    private RealmClassLoader classLoader;
 
     private ClassRealm parent;
 
@@ -84,7 +85,7 @@ public class DefaultClassRealm
         this( world, id, null );
     }
 
-    public DefaultClassRealm( ClassWorld world, String id, ClassLoader classLoader )
+    public DefaultClassRealm( ClassWorld world, String id, ClassLoader foreignClassLoader )
     {
         this.world = world;
 
@@ -92,31 +93,24 @@ public class DefaultClassRealm
 
         imports = new TreeSet();
 
-        if ( classLoader != null )
+        if ( foreignClassLoader != null )
         {
-            this.classLoader = classLoader;
+            this.foreignClassLoader = foreignClassLoader;
+        }
+
+        if ( "true".equals( System.getProperty( "classworlds.bootstrapped" ) ) )
+        {
+            classLoader = new UberJarRealmClassLoader();
         }
         else
         {
-            if ( "true".equals( System.getProperty( "classworlds.bootstrapped" ) ) )
-            {
-                this.classLoader = new UberJarRealmClassLoader();
-            }
-            else
-            {
-                this.classLoader = new RealmClassLoader();
-            }
+            classLoader = new RealmClassLoader();
         }
     }
 
     public URL[] getConstituents()
     {
-        if ( classLoader instanceof URLClassLoader )
-        {
-            return ((URLClassLoader)classLoader).getURLs();
-        }
-
-        return new URL[0];
+        return classLoader.getURLs();
     }
 
     public ClassRealm getParent()
@@ -147,7 +141,7 @@ public class DefaultClassRealm
 
     public void addConstituent( URL constituent )
     {
-        ( (RealmClassLoader) classLoader ).addConstituent( constituent );
+        classLoader.addConstituent( constituent );
     }
 
     public ClassRealm locateSourceRealm( String classname )
@@ -183,22 +177,23 @@ public class DefaultClassRealm
     // Classloading
     // ----------------------------------------------------------------------
 
-    public Class loadClass( String name )
-        throws ClassNotFoundException
-    {
-        if ( name.startsWith( "org.codehaus.classworlds." ) )
-        {
-            return getWorld().loadClass( name );
-        }
-
-        return getClassFromRealm( locateSourceRealm( name ), name );
-    }
-
     public Class getClassFromRealm( ClassRealm realm, String name )
         throws ClassNotFoundException
     {
         try
         {
+            if ( foreignClassLoader != null )
+            {
+                try
+                {
+                    return foreignClassLoader.loadClass( name );
+                }
+                catch ( ClassNotFoundException e )
+                {
+                    // Do nothing as we will now look in the realm.
+                }
+            }
+
             return realm.getClassLoader().loadClass( name );
         }
         catch ( ClassNotFoundException e )
@@ -212,10 +207,6 @@ public class DefaultClassRealm
         }
     }
 
-    // ----------------------------------------------------------------------
-    // Resource handling
-    // ----------------------------------------------------------------------
-
     private URL getResourceFromRealm( ClassRealm realm, String name )
     {
         URL resource = realm.getClassLoader().getResource( UrlUtils.normalizeUrlPath( name ) );
@@ -227,15 +218,6 @@ public class DefaultClassRealm
 
         return resource;
     }
-
-    public URL getResource( String name )
-    {
-        return getResourceFromRealm( this, name );
-    }
-
-    // ----------------------------------------------------------------------
-    // Resources handling
-    // ----------------------------------------------------------------------
 
     private Enumeration getResourcesFromRealm( ClassRealm realm, String name )
         throws IOException
@@ -250,19 +232,55 @@ public class DefaultClassRealm
         return resources;
     }
 
+    // ----------------------------------------------------------------------
+    // ClassLoader API
+    // ----------------------------------------------------------------------
+
+    public Class loadClass( String name )
+        throws ClassNotFoundException
+    {
+        if ( name.startsWith( "org.codehaus.classworlds." ) )
+        {
+            return getWorld().loadClass( name );
+        }
+
+        return getClassFromRealm( locateSourceRealm( name ), name );
+    }
+
+    public URL getResource( String name )
+    {
+        if ( foreignClassLoader != null )
+        {
+            URL resource = foreignClassLoader.getResource( name );
+
+            if ( resource != null )
+            {
+                return resource;
+            }
+        }
+
+        return getResourceFromRealm( this, name );
+    }
+
     public Enumeration getResources( String name )
         throws IOException
     {
+        if ( foreignClassLoader != null )
+        {
+            Enumeration resources = foreignClassLoader.getResources( name );
+
+            if ( resources != null )
+            {
+                return resources;
+            }
+        }
+
         return getResourcesFromRealm( this, name );
     }
 
-    // ----------------------------------------------------------------------
-    // Stream handling
-    // ----------------------------------------------------------------------
-
     public InputStream getResourceAsStream( String name )
     {
-        URL url = getResourceFromRealm( this, name );
+        URL url = getResource( name );
 
         InputStream is = null;
 
