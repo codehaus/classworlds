@@ -193,7 +193,7 @@ class ClassRealmImpl implements ClassRealm
     ClassRealmImpl locateSourceRealm( String classname )
     {
         Iterator entryIter = this.imports.iterator();
-        
+
         while ( entryIter.hasNext() )
         {
             Entry eachEntry = (Entry) entryIter.next();
@@ -285,10 +285,7 @@ class ClassRealmImpl implements ClassRealm
      */
     public URL getResource( String name )
     {
-        if ( name.startsWith( "/") )
-        {
-            name = name.substring(1);
-        }
+        name = UrlUtils.normalizeUrlPath( name );
 
         ClassRealmImpl sourceRealm = locateSourceRealm( name );
 

@@ -46,6 +46,8 @@ package org.codehaus.classworlds.protocol.jar;
 
  */
 
+import org.codehaus.classworlds.UrlUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -140,7 +142,7 @@ public class JarUrlConnection
 
     protected static URL normaliseURL( URL url ) throws MalformedURLException
     {
-        String text = url.toString();
+        String text = UrlUtils.normalizeUrlPath( url.toString() );
 
         if ( !text.startsWith( "jar:" ) )
         {
