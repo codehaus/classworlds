@@ -86,6 +86,9 @@ public class Configurator
     /** Load spec prefix. */
     public static final String LOAD_PREFIX = "load";
 
+    /** Optionally spec prefix. */
+    public static final String OPTIONALLY_PREFIX = "optionally";
+
     // ------------------------------------------------------------
     //     Instance members
     // ------------------------------------------------------------
@@ -253,7 +256,7 @@ public class Configurator
 
                 if ( constituent.indexOf( "*" ) >= 0 )
                 {
-                    loadGlob( constituent, curRealm );
+                    loadGlob( constituent, curRealm, false );
                 }
                 else
                 {
@@ -272,6 +275,37 @@ public class Configurator
                         catch (MalformedURLException e)
                         {
                             throw new FileNotFoundException( constituent );
+                        }
+                    }
+                }
+            }
+            else if ( line.startsWith( OPTIONALLY_PREFIX ) )
+            {
+                String constituent = line.substring( OPTIONALLY_PREFIX.length() ).trim();
+
+                constituent = filter( constituent );
+
+                if ( constituent.indexOf( "*" ) >= 0 )
+                {
+                    loadGlob( constituent, curRealm, true );
+                }
+                else
+                {
+                    File file = new File( constituent );
+
+                    if ( file.exists() )
+                    {
+                        curRealm.addConstituent( file.toURL() );
+                    }
+                    else
+                    {
+                        try
+                        {
+                            curRealm.addConstituent( new URL( constituent ) );
+                        }
+                        catch (MalformedURLException e)
+                        {
+                            // swallow
                         }
                     }
                 }
@@ -348,13 +382,28 @@ public class Configurator
      *
      *  @throws MalformedURLException If the line does not represent
      *          a valid path element.
+     *  @throws FileNotFoundException If the line does not represetn
+     *          a valid path element in the filesystem.
      */
     protected void loadGlob(String line,
-                            ClassRealm realm) throws MalformedURLException
+                            ClassRealm realm,
+                            boolean optionally) throws MalformedURLException, FileNotFoundException
     {
         File globFile = new File( line );
 
         File dir = globFile.getParentFile();
+
+        if ( ! dir.exists() )
+        {
+            if ( optionally )
+            {
+                return;
+            }
+            else 
+            {
+                throw new FileNotFoundException( dir.toString() );
+            }
+        }
 
         String localName = globFile.getName();
 
@@ -364,31 +413,28 @@ public class Configurator
 
         final String suffix = localName.substring( starLoc + 1 );
 
-        if ( dir.exists() )
-        {
-            File[] matches = dir.listFiles(
-                new FilenameFilter() {
-                    public boolean accept(File dir, String name)
+        File[] matches = dir.listFiles(
+            new FilenameFilter() {
+                public boolean accept(File dir, String name)
+                {
+                    if ( !name.startsWith( prefix ) )
                     {
-                        if ( !name.startsWith( prefix ) )
-                        {
-                            return false;
-                        }
-    
-                        if ( !name.endsWith( suffix ) )
-                        {
-                            return false;
-                        }
-    
-                        return true;
+                        return false;
                     }
+                    
+                    if ( !name.endsWith( suffix ) )
+                    {
+                        return false;
+                    }
+                    
+                    return true;
                 }
-                );
-
-            for ( int i = 0 ; i < matches.length ; ++i )
-            {
-                realm.addConstituent( matches[i].toURL() );
             }
+            );
+        
+        for ( int i = 0 ; i < matches.length ; ++i )
+        {
+            realm.addConstituent( matches[i].toURL() );
         }
     }
 
