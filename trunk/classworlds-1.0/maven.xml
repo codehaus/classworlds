@@ -22,6 +22,7 @@
       <fileset dir="${maven.build.dir}/classes">
         <include name="org/codehaus/classworlds/boot/*.class"/>
         <include name="org/codehaus/classworlds/protocol/**/*.class"/>
+        <include name="org/codehaus/classworlds/UrlUtils.class"/>
       </fileset> 
     </copy>
 
@@ -134,6 +135,7 @@
   			<include name="org/codehaus/classworlds/boot/InitialClassLoader.class"/>
   			<include name="org/codehaus/classworlds/protocol/jar/Handler.class"/>
   			<include name="org/codehaus/classworlds/protocol/jar/JarUrlConnection.class"/>
+  			<include name="org/codehaus/classworlds/UrlUtils.class"/>               
   		</fileset>
   	</copy>
   	
