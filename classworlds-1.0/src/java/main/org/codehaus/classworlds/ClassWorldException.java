@@ -69,11 +69,22 @@ public class ClassWorldException extends Exception
      *
      *  @param world The world.
      */
-    public ClassWorldException(ClassWorld world)
+    public ClassWorldException(final ClassWorld world)
     {
         this.world = world;
     }
-
+    
+    /** Construct.
+     *
+     *  @param world The world.
+     *  @param msg The detail message.
+     */
+    public ClassWorldException(final ClassWorld world, final String msg)
+    {
+        super( msg );
+        this.world = world;
+    }
+    
     // ------------------------------------------------------------
     //     Instance methods
     // ------------------------------------------------------------

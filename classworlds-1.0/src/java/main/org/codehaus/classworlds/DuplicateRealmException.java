@@ -74,8 +74,8 @@ public class DuplicateRealmException extends ClassWorldException
     public DuplicateRealmException(ClassWorld world,
                                    String id)
     {
-        super( world );
-        this.id    = id;
+        super( world, id );
+        this.id = id;
     }
 
     // ------------------------------------------------------------

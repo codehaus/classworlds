@@ -72,10 +72,10 @@ public class NoSuchRealmException extends ClassWorldException
      *  @param id The realm id.
      */
     public NoSuchRealmException(ClassWorld world,
-                                   String id)
+                                String id)
     {
-        super( world );
-        this.id    = id;
+        super( world, id );
+        this.id = id;
     }
 
     // ------------------------------------------------------------
