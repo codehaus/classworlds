@@ -20,8 +20,8 @@
     <mkdir dir="${boot.classes}"/>
     <copy todir="${boot.classes}">
       <fileset dir="${maven.build.dir}/classes">
-        <include name="org/codehaus/classworlds/boot/*.class"/>
-        <include name="org/codehaus/classworlds/protocol/**/*.class"/>
+        <include name="org/codehaus/classworlds/uberjar/boot/*.class"/>
+        <include name="org/codehaus/classworlds/uberjar/protocol/**/*.class"/>
         <include name="org/codehaus/classworlds/UrlUtils.class"/>
       </fileset> 
     </copy>
