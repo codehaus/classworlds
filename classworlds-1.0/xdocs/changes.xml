@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<document>
+  <properties>
+    <title>Changes</title>
+    <author email="jason@maven.org">Jason van Zyl</author>
+  </properties>
+
+  <body>
+    <release version="1.0-rc3" date="in CVS">
+      <action dev="jvanzyl" type="fix">
+        Fixed the handling of URLs that contain ".." and URLs that
+        start with a leading slash.
+      </action>
+    </release>
+  </body>
+</document>
+
