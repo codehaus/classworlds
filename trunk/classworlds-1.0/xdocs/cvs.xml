@@ -15,11 +15,11 @@
       When prompted for a password for anonymous, simply press the Enter key.
       </p>
 
-<pre>
-    cvs -d:pserver:anonymous@cvs.werken.com:/cvsroot/classworlds login
+<source>
+    cvs -d:pserver:anonymous@cvs.codehaus.org:/scm/cvspublic login
 
-    cvs -z3 -d:pserver:anonymous@cvs.werken.com:/cvsroot/classworlds co classworlds
-</pre>
+    cvs -z3 -d:pserver:anonymous@cvs.codehaus.org:/scm/cvspublic co classworlds
+</source>
 
     <p>
     Updates from within the module's directory do not need the -d parameter.
@@ -34,11 +34,15 @@
     with the proper value. Enter your site password when prompted.
     </p>
 
-<pre>
+<source>
     export CVS_RSH=ssh
- 
-    cvs -z3 -d:ext:<b>developername</b>@cvs.werken.com:/cvsroot/classworlds co classworlds
-</pre>
+
+    cvs -z3 -dDEVELOPERNAME@cvs.codehaus.org:/scm/cvs co classworlds
+</source>
+
+   <p>
+   where DEVELOPERNAME is replaced with your codehaus login name.
+   </p>
 
     </section>
   </body>
