@@ -12,7 +12,7 @@
     <section name="Maven Uberjarring">
       <p>
       Pete Kazmier has written the 
-      <a href="http://jakarta.apache.org/turbine/maven/reference/plugins/uberjar/">uberjar plugin for maven</a>.
+      <a href="http://maven.apache.org/reference/plugins/uberjar">uberjar plugin for maven</a>.
       </p>
   
       <p>
