@@ -285,6 +285,11 @@ class ClassRealmImpl implements ClassRealm
      */
     public URL getResource( String name )
     {
+        if ( name.startsWith( "/") )
+        {
+            name = name.substring(1);
+        }
+
         ClassRealmImpl sourceRealm = locateSourceRealm( name );
 
         if ( sourceRealm == this )
