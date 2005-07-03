@@ -192,7 +192,7 @@ class RealmClassLoader
      */
     Class loadClassDirect(String name) throws ClassNotFoundException
     {
-        return super.loadClass( name, true );
+        return super.loadClass( name, false );
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
