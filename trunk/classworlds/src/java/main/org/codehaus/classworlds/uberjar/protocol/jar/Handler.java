@@ -168,7 +168,7 @@ public class Handler
 
         setURL( url,
                 "jar",
-                null,
+                "",
                 0,
                 null,
                 null,
