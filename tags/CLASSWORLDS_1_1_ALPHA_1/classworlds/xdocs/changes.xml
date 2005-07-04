@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<document>
+  <properties>
+    <title>Changes</title>
+    <author email="jason@maven.org">Jason van Zyl</author>
+  </properties>
+
+  <body>
+    <release version="1.0-rc3" date="in CVS">
+      <action dev="dandiep" type="feature">
+        Added support for ClassRealms that inherit from an existing 
+        ClassLoader.  This allows ClassWorlds to work in situations where
+        it isn't being used to bootstrap the application.
+      </action>
+      <action dev="jvanzyl" type="fix">
+        Fixed the handling of URLs that contain ".." and URLs that
+        start with a leading slash.
+      </action>
+      <action dev="jvanzyl" type="fix">
+        Apply Stephen Haberman's patch so that getJarFile decodes the getFile()
+        contents correctly. Refer to 
+        <a href="http://jira.codehaus.org/secure/ViewIssue.jspa?key=CLASSWORLDS-7">CLASSWORDS-7</a> 
+        in JIRA.
+      </action>
+    </release>
+    <release version="1.1-alpha-1" date="in CVS">
+      <action dev="dandiep" type="feature">
+        Added support better support for resources.
+      </action>
+      <action dev="dandiep" type="feature">
+        Classloading happens now in this order:
+        <ul>
+          <li>Imports</li>
+          <li>Local class realm</li>
+          <li>Parent realm</li>
+        </ul>
+        This is subject to change and will probably be configurable in
+        the future.
+      </action>
+    </release>
+  </body>
+</document>
+
