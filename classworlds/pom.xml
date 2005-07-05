@@ -4,7 +4,7 @@
   <artifactId>classworlds</artifactId>
   <packaging>jar</packaging>
   <name>classworlds</name>
-  <version>1.1-alpha-2</version>
+  <version>1.1-beta-1-SNAPSHOT</version>
   <description></description>
   <url>http://cvs.classworlds.codehaus.org/</url>
   <inceptionYear>2002</inceptionYear>
