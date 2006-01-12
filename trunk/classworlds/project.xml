@@ -40,7 +40,7 @@
   </mailingLists>
   <repository>
     <connection>scm:cvs:pserver:anonymous@cvs.classworlds.codehaus.org:/home/projects/classworlds/scm/:classworlds</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.classworlds.codehaus.org:/home/projects/classworlds/scm/:classworlds</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.classworlds.codehaus.org:/home/projects/classworlds/scm/:classworlds</developerConnection>
     <url>http://cvs.classworlds.codehaus.org/</url>
   </repository>
   <developers>
