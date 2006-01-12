@@ -69,6 +69,65 @@
   <build>
     <sourceDirectory>src/java/main</sourceDirectory>
     <testSourceDirectory>src/java/test</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.1.2</version>
+        <configuration>
+          <fork>true</fork>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <tasks>
+                <copy todir="${project.build.directory}/test-data">
+                  <fileset dir="src/test-data" includes="**/*"/>
+                </copy>
+                <mkdir dir="${project.build.directory}/abcd-classes"/>
+                <javac 
+                  fork="yes"
+                  executable="${java.home}/../bin/javac"
+                  destdir="${project.build.directory}/abcd-classes"
+                  debug="on"
+                  classpath="${maven.build.dest}"
+                  srcdir="${basedir}/src/java/abcd/"/>
+                <mkdir dir="${project.build.directory}/test-data"/>
+                <jar jarfile="${project.build.directory}/test-data/a.jar">
+                  <fileset dir="${project.build.directory}/abcd-classes" includes="a/**"/>
+                  <fileset dir="src/test-data" includes="a.properties"/>
+                </jar>
+                  
+                <jar jarfile="${project.build.directory}/test-data/b.jar"
+                   basedir="${project.build.directory}/abcd-classes"
+                   includes="b/**"/>
+              
+                <jar jarfile="${project.build.directory}/test-data/c.jar"
+                   basedir="${project.build.directory}/abcd-classes"
+                   includes="c/**"/>
+              
+                <jar jarfile="${project.build.directory}/test-data/d.jar"
+                   basedir="${project.build.directory}/abcd-classes"
+                   includes="d/**"/>
+                <mkdir dir="${project.build.directory}/lib"/>
+                <copy todir="${project.build.directory}/lib" file="${project.build.directory}/test-data/a.jar"/>
+                <jar jarfile="${project.build.directory}/test-data/nested.jar">
+                  <fileset dir="src/test-data" includes="nested.properties"/>
+                  <fileset dir="${project.build.directory}" includes="lib/a.jar"/>
+                </jar>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   <organization>
     <name>The Codehaus</name>
