@@ -1,8 +1,0 @@
-<component-set>
-  <components>
-    <component>
-      <role>org.codehaus.plexus.Component2</role>
-      <implementation>org.codehaus.plexus.DefaultComponent2</implementation>
-    </component>
-  </components>
-</component-set>

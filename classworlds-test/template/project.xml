@@ -1,5 +1,0 @@
-<project>
-  <groupId>plexus</groupId>
-  <artifactId>component${count}</artifactId>
-  <version>1.0</version>
-</project>
