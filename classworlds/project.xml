@@ -4,7 +4,7 @@
   <pomVersion>3</pomVersion>
   <name>classworlds</name>
   <id>classworlds</id>
-  <currentVersion>1.1-SNAPSHOT</currentVersion>
+  <currentVersion>1.1</currentVersion>
   <organization>
     <name>The Codehaus</name>
     <url>http://codehaus.org/</url>
@@ -14,7 +14,7 @@
   <package>org.codehaus.classworlds</package>
   <shortDescription>classworlds: Java(tm) ClassLoader Management Framework</shortDescription>
   <logo>http://images.werken.com/classworlds.gif</logo>
-  <description></description>
+  <description/>
   <url>http://classworlds.codehaus.org/</url>
   <siteAddress>classworlds.codehaus.org</siteAddress>
   <siteDirectory>/www/classworlds.codehaus.org</siteDirectory>
@@ -94,4 +94,11 @@
     <report>maven-simian-plugin</report>
     <report>maven-clover-plugin</report>
   </reports>
+  <versions>
+    <version>
+      <id>1.1</id>
+      <name>1.1</name>
+      <tag>CLASSWORLDS_1_1</tag>
+    </version>
+  </versions>
 </project>
